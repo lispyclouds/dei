@@ -25,6 +25,18 @@ func Cmd() *cli.Command {
 				Usage:    "The site for the password",
 				Required: true,
 			},
+			&cli.IntFlag{
+				Name:  "counter",
+				Usage: "The current counter/generation of the credential",
+				Value: 1,
+				Validator: func(v int) error {
+					if v <= 0 {
+						return fmt.Errorf("counter must be 1 or greater")
+					}
+
+					return nil
+				},
+			},
 			&cli.StringFlag{
 				Name:  "variant",
 				Usage: "The type of credentials to generate",
