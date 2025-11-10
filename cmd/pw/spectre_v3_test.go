@@ -22,7 +22,7 @@ func TestPassword(t *testing.T) {
 	key, err := mainKey("test", "pass", SiteVariant("password"))
 	assert.NoError(t, err)
 
-	password, err := password(key, "site", "", 1, PASSWORD, MAXIMUM)
+	password, err := password(key, "site", 1, PASSWORD, MAXIMUM)
 	assert.NoError(t, err)
 
 	assert.Equal(t, password, "QsKBWAYdT9dh^AOGVA0.")

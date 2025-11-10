@@ -141,7 +141,7 @@ func mainKey(fullName, mainPass string, siteVariant SiteVariant) ([]byte, error)
 	return scrypt.Key([]byte(mainPass), buffer.Bytes(), 32768, 8, 2, 64)
 }
 
-func password(mainKey []byte, site, context string, counter int, siteVariant SiteVariant, class TemplateClass) (string, error) {
+func password(mainKey []byte, site string, counter int, siteVariant SiteVariant, class TemplateClass) (string, error) {
 	buffer := bytes.NewBuffer([]byte{})
 	defer buffer.Reset()
 
@@ -149,11 +149,6 @@ func password(mainKey []byte, site, context string, counter int, siteVariant Sit
 	buffer.Write(toBytes(len(site)))
 	buffer.Write([]byte(site))
 	buffer.Write(toBytes(counter))
-
-	if context != "" {
-		buffer.Write(toBytes(len(context)))
-		buffer.Write([]byte(context))
-	}
 
 	seed, err := hmacSha256(mainKey, buffer.Bytes())
 	if err != nil {

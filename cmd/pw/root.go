@@ -51,18 +51,8 @@ func Cmd() *cli.Command {
 					return nil
 				},
 			},
-			&cli.StringFlag{
-				Name:  "context",
-				Usage: "Optional, useful for variant answer. Empty for a universal site answer or the most significant word(s) of the question",
-				Value: "",
-			},
-			&cli.IntFlag{
-				Name:  "counter",
-				Usage: "The counter of the current password for the site",
-				Value: 1,
-			},
 		},
-		Action: func(ctx context.Context, cmd *cli.Command) error {
+		Action: func(_ context.Context, cmd *cli.Command) error {
 			var mainPass string
 
 			if err := huh.NewInput().
@@ -87,7 +77,7 @@ func Cmd() *cli.Command {
 				return err
 			}
 
-			password, err := password(mainKey, cmd.String("site"), cmd.String("context"), cmd.Int("counter"), variant, TemplateClass(cmd.String("class")))
+			password, err := password(mainKey, cmd.String("site"), cmd.Int("counter"), variant, TemplateClass(cmd.String("class")))
 			if err != nil {
 				return err
 			}
