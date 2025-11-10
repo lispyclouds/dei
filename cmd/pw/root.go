@@ -27,7 +27,7 @@ func Cmd() *cli.Command {
 			},
 			&cli.StringFlag{
 				Name:  "variant",
-				Usage: "The kind of credentials to generate",
+				Usage: "The type of credentials to generate",
 				Value: "password",
 				Validator: func(v string) error {
 					allowed := []string{"password", "login", "answer"}
@@ -39,8 +39,8 @@ func Cmd() *cli.Command {
 				},
 			},
 			&cli.StringFlag{
-				Name:  "kind",
-				Usage: "The kind of the password",
+				Name:  "class",
+				Usage: "The class of the credential generated",
 				Value: "maximum",
 				Validator: func(v string) error {
 					allowed := []string{"maximum", "long", "medium", "basic", "short", "pin", "name", "phrase"}
@@ -87,7 +87,7 @@ func Cmd() *cli.Command {
 				return err
 			}
 
-			password, err := password(mainKey, cmd.String("site"), cmd.String("context"), cmd.Int("counter"), variant, Kind(cmd.String("kind")))
+			password, err := password(mainKey, cmd.String("site"), cmd.String("context"), cmd.Int("counter"), variant, TemplateClass(cmd.String("class")))
 			if err != nil {
 				return err
 			}
