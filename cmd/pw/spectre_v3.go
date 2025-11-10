@@ -28,6 +28,7 @@ const (
 func toBytes(n int) []byte {
 	b := make([]byte, 4)
 	binary.BigEndian.PutUint32(b, uint32(n))
+
 	return b
 }
 
@@ -43,9 +44,16 @@ func scopeForVariant(siteVariant SiteVariant) []byte {
 }
 
 func templateOf(kind Kind, seed byte) []byte {
-	templates := map[Kind][][]byte{
-		MAXIMUM: {[]byte("anoxxxxxxxxxxxxxxxxx"), []byte("axxxxxxxxxxxxxxxxxno")},
-		LONG: {
+	var templates [][]byte
+
+	switch kind {
+	case MAXIMUM:
+		templates = [][]byte{
+			[]byte("anoxxxxxxxxxxxxxxxxx"),
+			[]byte("axxxxxxxxxxxxxxxxxno"),
+		}
+	case LONG:
+		templates = [][]byte{
 			[]byte("CvcvnoCvcvCvcv"),
 			[]byte("CvcvCvcvnoCvcv"),
 			[]byte("CvcvCvcvCvcvno"),
@@ -67,35 +75,59 @@ func templateOf(kind Kind, seed byte) []byte {
 			[]byte("CvccnoCvcvCvcc"),
 			[]byte("CvccCvcvnoCvcc"),
 			[]byte("CvccCvcvCvccno"),
-		},
-		MEDIUM: {[]byte("CvcnoCvc"), []byte("CvcCvcno")},
-		BASIC:  {[]byte("aaanaaan"), []byte("aannaaan"), []byte("aaannaaa")},
-		SHORT:  {[]byte("Cvcn")},
-		PIN:    {[]byte("nnnn")},
-		NAME:   {[]byte("cvccvcvcv")},
-		PHRASE: {[]byte("cvcc cvc cvccvcv cvc"), []byte("cvc cvccvcvcv cvcv"), []byte("cv cvccv cvc cvcvccv")},
+		}
+	case MEDIUM:
+		templates = [][]byte{[]byte("CvcnoCvc"), []byte("CvcCvcno")}
+	case BASIC:
+		templates = [][]byte{
+			[]byte("aaanaaan"),
+			[]byte("aannaaan"),
+			[]byte("aaannaaa"),
+		}
+	case SHORT:
+		templates = [][]byte{[]byte("Cvcn")}
+	case PIN:
+		templates = [][]byte{[]byte("nnnn")}
+	case NAME:
+		templates = [][]byte{[]byte("cvccvcvcv")}
+	case PHRASE:
+		templates = [][]byte{
+			[]byte("cvcc cvc cvccvcv cvc"),
+			[]byte("cvc cvccvcvcv cvcv"),
+			[]byte("cv cvccv cvc cvcvccv"),
+		}
 	}
-	template := templates[kind]
 
-	return template[int(seed)%len(template)]
+	return templates[int(seed)%len(templates)]
 }
 
 func charFromClass(class byte, seed int) byte {
-	lookup := map[byte][]byte{
-		'V': []byte("AEIOU"),
-		'C': []byte("BCDFGHJKLMNPQRSTVWXYZ"),
-		'v': []byte("aeiou"),
-		'c': []byte("bcdfghjklmnpqrstvwxyz"),
-		'A': []byte("AEIOUBCDFGHJKLMNPQRSTVWXYZ"),
-		'a': []byte("AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz"),
-		'n': []byte("0123456789"),
-		'o': []byte("@&%?,=[]_:-+*$#!'^~;()/."),
-		'x': []byte("AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz0123456789!@#$%^&*()"),
-		' ': []byte(" "),
-	}
-	bs := lookup[class]
+	var lookup []byte
 
-	return bs[seed%len(bs)]
+	switch class {
+	case 'V':
+		lookup = []byte("AEIOU")
+	case 'C':
+		lookup = []byte("BCDFGHJKLMNPQRSTVWXYZ")
+	case 'v':
+		lookup = []byte("aeiou")
+	case 'c':
+		lookup = []byte("bcdfghjklmnpqrstvwxyz")
+	case 'A':
+		lookup = []byte("AEIOUBCDFGHJKLMNPQRSTVWXYZ")
+	case 'a':
+		lookup = []byte("AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz")
+	case 'n':
+		lookup = []byte("0123456789")
+	case 'o':
+		lookup = []byte("@&%?,=[]_:-+*$#!'^~;()/.")
+	case 'x':
+		lookup = []byte("AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz0123456789!@#$%^&*()")
+	case ' ':
+		lookup = []byte(" ")
+	}
+
+	return lookup[seed%len(lookup)]
 }
 
 func mainKey(fullName, mainPass string, siteVariant SiteVariant) ([]byte, error) {
