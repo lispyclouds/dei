@@ -27,3 +27,10 @@ func TestPassword(t *testing.T) {
 
 	assert.Equal(t, password, "QsKBWAYdT9dh^AOGVA0.")
 }
+
+func BenchmarkV3(b *testing.B) {
+	for b.Loop() {
+		key, _ := mainKey("test", "pass", SiteVariant("password"))
+		password(key, "site", 1, PASSWORD, MAXIMUM)
+	}
+}
