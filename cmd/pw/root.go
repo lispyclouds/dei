@@ -6,10 +6,11 @@ import (
 	"slices"
 
 	"github.com/charmbracelet/huh"
+	"github.com/lispyclouds/dei/pkg"
 	"github.com/urfave/cli/v3"
 )
 
-func Cmd() *cli.Command {
+func Cmd(cache *pkg.Cache) *cli.Command {
 	return &cli.Command{
 		Name:    "pw",
 		Aliases: []string{"pwd", "pass", "password"},
@@ -63,38 +64,72 @@ func Cmd() *cli.Command {
 					return nil
 				},
 			},
+			&cli.BoolFlag{
+				Name:  "flush-cache",
+				Usage: "Ignore current cache and refresh values",
+				Value: false,
+			},
 		},
 		Action: func(_ context.Context, cmd *cli.Command) error {
-			var mainPass string
+			var (
+				key       []byte
+				identicon string
+			)
+			keyCacheKey, identiconCacheKey := "dei.password.mainKey", "dei.password.identicon"
 
-			if err := huh.NewInput().
-				Title("Enter your main password").
-				Value(&mainPass).
-				EchoMode(huh.EchoModePassword).
-				Run(); err != nil {
+			cachedKey, err := cache.Get(keyCacheKey)
+			if err != nil {
+				return err
+			}
+
+			cachedIdenticon, err := cache.Get(identiconCacheKey)
+			if err != nil {
 				return err
 			}
 
 			fullName := cmd.String("full-name")
-
-			identicon, err := identiconOf(fullName, mainPass)
-			if err != nil {
-				return err
-			}
-
 			variant := SiteVariant(cmd.String("variant"))
 
-			mainKey, err := mainKey(fullName, mainPass, variant)
+			if cmd.Bool("flush-cache") || cachedKey == nil || cachedIdenticon == nil {
+				var mainPass string
+
+				if err := huh.NewInput().
+					Title("Enter your main password").
+					Value(&mainPass).
+					EchoMode(huh.EchoModePassword).
+					Run(); err != nil {
+					return err
+				}
+
+				identicon, err = identiconOf(fullName, mainPass)
+				if err != nil {
+					return err
+				}
+
+				key, err = mainKey(fullName, mainPass, variant)
+				if err != nil {
+					return err
+				}
+
+				if err = cache.Put(keyCacheKey, key); err != nil {
+					return err
+				}
+
+				if err = cache.Put(identiconCacheKey, []byte(identicon)); err != nil {
+					return err
+				}
+			} else {
+				key = cachedKey
+				identicon = string(cachedIdenticon)
+			}
+
+			pass, err := password(key, cmd.String("site"), cmd.Int("counter"), variant, TemplateClass(cmd.String("class")))
 			if err != nil {
 				return err
 			}
 
-			password, err := password(mainKey, cmd.String("site"), cmd.Int("counter"), variant, TemplateClass(cmd.String("class")))
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(identicon, password)
+			fmt.Println(identicon)
+			fmt.Println(pass)
 
 			return nil
 		},
