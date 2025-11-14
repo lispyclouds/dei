@@ -12,3 +12,5 @@ go.work
 go.work.sum
 .env
 .clj-kondo/
+.lsp
+.nrepl-port

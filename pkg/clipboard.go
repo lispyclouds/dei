@@ -5,6 +5,7 @@ import (
 	"maps"
 	"os/exec"
 	"runtime"
+	"slices"
 )
 
 var conf map[string]map[string][]string = map[string]map[string][]string{
@@ -20,7 +21,7 @@ func getCopyCmd(tools map[string][]string) (*exec.Cmd, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("Cannot find a clipboard tool, tried %v", maps.Keys(tools))
+	return nil, fmt.Errorf("Cannot find a clipboard tool, tried %v", slices.Collect(maps.Keys(tools)))
 }
 
 func CopyToClipboard(data string) error {
