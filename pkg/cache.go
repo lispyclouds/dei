@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"errors"
 	"os"
 	"path"
 
@@ -13,18 +12,6 @@ type Cache struct {
 	bucket []byte
 }
 
-func mkdir(path string) error {
-	if _, err := os.Stat(path); err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			if err = os.MkdirAll(path, os.ModePerm); err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
-}
-
 func NewCache() (*Cache, error) {
 	cacheDir, err := os.UserCacheDir()
 	if err != nil {
@@ -32,7 +19,7 @@ func NewCache() (*Cache, error) {
 	}
 
 	dbDir := path.Join(cacheDir, "dei")
-	if err := mkdir(dbDir); err != nil {
+	if err = os.MkdirAll(dbDir, os.ModePerm); err != nil {
 		return nil, err
 	}
 

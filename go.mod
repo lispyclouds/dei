@@ -22,7 +22,7 @@ require (
 	github.com/charmbracelet/x/cellbuf v0.0.14 // indirect
 	github.com/charmbracelet/x/errors v0.0.0-20251110184232-6ab307057ac7 // indirect
 	github.com/charmbracelet/x/exp/golden v0.0.0-20251110184232-6ab307057ac7 // indirect
-	github.com/charmbracelet/x/exp/strings v0.0.0-20251112221808-faa4aaac98c3 // indirect
+	github.com/charmbracelet/x/exp/strings v0.0.0-20251113172435-cef867b85f6a // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
 	github.com/charmbracelet/x/xpty v0.1.3 // indirect
 	github.com/clipperhouse/displaywidth v0.5.0 // indirect

@@ -69,6 +69,11 @@ func Cmd(cache *pkg.Cache) *cli.Command {
 				Usage: "Ignore current cache and refresh values",
 				Value: false,
 			},
+			&cli.BoolFlag{
+				Name:  "to-clipboard",
+				Usage: "Copy the password to clipboard instead of displaying",
+				Value: false,
+			},
 		},
 		Action: func(_ context.Context, cmd *cli.Command) error {
 			var (
@@ -129,9 +134,13 @@ func Cmd(cache *pkg.Cache) *cli.Command {
 			}
 
 			fmt.Println(identicon)
-			fmt.Println(pass)
 
-			return nil
+			if !cmd.Bool("to-clipboard") {
+				fmt.Println(pass)
+				return nil
+			}
+
+			return pkg.CopyToClipboard(pass)
 		},
 	}
 }
