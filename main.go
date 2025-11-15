@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/lispyclouds/dei/cmd"
 	"github.com/lispyclouds/dei/cmd/pw"
 	"github.com/lispyclouds/dei/pkg"
 	"github.com/urfave/cli/v3"
@@ -21,7 +22,15 @@ func main() {
 		Name:  "dei",
 		Usage: "me in the CLI",
 		Commands: []*cli.Command{
-			pw.Cmd(cache),
+			pw.PwdCmd(cache),
+			cmd.CommitCmd(cache),
+		},
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:  "flush-cache",
+				Usage: "Ignore current cache and refresh values",
+				Value: false,
+			},
 		},
 	}
 

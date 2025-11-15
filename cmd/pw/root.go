@@ -10,7 +10,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func Cmd(cache *pkg.Cache) *cli.Command {
+func PwdCmd(cache *pkg.Cache) *cli.Command {
 	return &cli.Command{
 		Name:    "pw",
 		Aliases: []string{"pwd", "pass", "password"},
@@ -63,11 +63,6 @@ func Cmd(cache *pkg.Cache) *cli.Command {
 
 					return nil
 				},
-			},
-			&cli.BoolFlag{
-				Name:  "flush-cache",
-				Usage: "Ignore current cache and refresh values",
-				Value: false,
 			},
 			&cli.BoolFlag{
 				Name:  "to-clipboard",
