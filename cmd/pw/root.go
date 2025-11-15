@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/charmbracelet/huh"
 	"github.com/lispyclouds/dei/pkg"
 	"github.com/urfave/cli/v3"
 )
@@ -91,13 +90,8 @@ func PwdCmd(cache *pkg.Cache) *cli.Command {
 			variant := SiteVariant(cmd.String("variant"))
 
 			if cmd.Bool("flush-cache") || cachedKey == nil || cachedIdenticon == nil {
-				var mainPass string
-
-				if err := huh.NewInput().
-					Title("Enter your main password").
-					Value(&mainPass).
-					EchoMode(huh.EchoModePassword).
-					Run(); err != nil {
+				mainPass, err := pkg.Input("Enter your main password", "", true)
+				if err != nil {
 					return err
 				}
 
