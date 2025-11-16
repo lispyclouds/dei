@@ -76,7 +76,7 @@ func PwdCmd(cache *pkg.Cache) *cli.Command {
 			)
 			keyCacheKey, identiconCacheKey := "dei.password.mainKey", "dei.password.identicon"
 
-			cachedKey, err := cache.Get(keyCacheKey)
+			key, err := cache.Get(keyCacheKey)
 			if err != nil {
 				return err
 			}
@@ -86,10 +86,14 @@ func PwdCmd(cache *pkg.Cache) *cli.Command {
 				return err
 			}
 
+			if cachedIdenticon != nil {
+				identicon = string(cachedIdenticon)
+			}
+
 			fullName := cmd.String("full-name")
 			variant := SiteVariant(cmd.String("variant"))
 
-			if cmd.Bool("flush-cache") || cachedKey == nil || cachedIdenticon == nil {
+			if cmd.Bool("flush-cache") || key == nil || cachedIdenticon == nil {
 				mainPass, err := pkg.Input("Enter your main password", "", true)
 				if err != nil {
 					return err
@@ -112,9 +116,6 @@ func PwdCmd(cache *pkg.Cache) *cli.Command {
 				if err = cache.Put(identiconCacheKey, []byte(identicon)); err != nil {
 					return err
 				}
-			} else {
-				key = cachedKey
-				identicon = string(cachedIdenticon)
 			}
 
 			pass, err := password(key, cmd.String("site"), cmd.Int("counter"), variant, TemplateClass(cmd.String("class")))

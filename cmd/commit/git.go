@@ -65,19 +65,19 @@ func commit(cache *pkg.Cache) error {
 		return err
 	}
 
-	var commitMsg string
+	var extendedCommitMsg string
 	if err = huh.NewForm(
 		huh.NewGroup(
 			huh.NewText().
-				Title("Commit Message").
-				Value(&commitMsg),
+				Title("Extended Commit Message").
+				Value(&extendedCommitMsg),
 		),
 	).Run(); err != nil {
 		return err
 	}
 
-	if len(commitMsg) > 0 {
-		commitMsg = "\n\n" + commitMsg
+	if len(extendedCommitMsg) > 0 {
+		extendedCommitMsg = "\n\n" + extendedCommitMsg
 	}
 
 	coAuthors, err := loadCoAuthors(cache)
@@ -121,7 +121,7 @@ func commit(cache *pkg.Cache) error {
 		"commit",
 		"--cleanup=verbatim",
 		"-m",
-		fmt.Sprintf("[%s] %s%s%s", feat, summary, commitMsg, coAuthorsText),
+		fmt.Sprintf("[%s] %s%s%s", feat, summary, extendedCommitMsg, coAuthorsText),
 	); err != nil {
 		return err
 	}
