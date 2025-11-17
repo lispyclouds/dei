@@ -146,11 +146,11 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 			return err
 		}
 
-		if err = cache.Put(keyCacheKey, key); err != nil {
-			return err
-		}
-
-		if err = cache.Put(identiconCacheKey, []byte(identicon)); err != nil {
+		if err = cache.
+			WithWriteTxn().
+			Put(keyCacheKey, key).
+			Put(identiconCacheKey, []byte(identicon)).
+			Run(); err != nil {
 			return err
 		}
 	}

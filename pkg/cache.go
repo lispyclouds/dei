@@ -12,6 +12,16 @@ type Cache struct {
 	bucket []byte
 }
 
+type pair struct {
+	k string
+	v []byte
+}
+
+type WriteTxn struct {
+	cache *Cache
+	pairs []pair
+}
+
 func NewCache() (*Cache, error) {
 	cacheDir, err := os.UserCacheDir()
 	if err != nil {
@@ -64,4 +74,25 @@ func (c *Cache) Get(k string) ([]byte, error) {
 	}
 
 	return value, nil
+}
+
+func (c *Cache) WithWriteTxn() *WriteTxn {
+	return &WriteTxn{cache: c}
+}
+
+func (wtx *WriteTxn) Put(k string, v []byte) *WriteTxn {
+	wtx.pairs = append(wtx.pairs, pair{k, v})
+	return wtx
+}
+
+func (wtx *WriteTxn) Run() error {
+	return wtx.cache.db.Update(func(tx *bbolt.Tx) error {
+		for _, pair := range wtx.pairs {
+			if err := tx.Bucket(wtx.cache.bucket).Put([]byte(pair.k), pair.v); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
 }
