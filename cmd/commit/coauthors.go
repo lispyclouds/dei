@@ -15,19 +15,18 @@ const coAuthorsKey = "dei.commit.coAuthors"
 type CoAuthors = map[string]map[string]string
 
 func loadCoAuthors(cache *pkg.Cache) (CoAuthors, error) {
-	var coAuthors CoAuthors
-
 	data, err := cache.Get(coAuthorsKey)
 	if err != nil {
 		return nil, err
 	}
 
 	if data == nil {
-		coAuthors = make(CoAuthors)
-	} else {
-		if err = json.UnmarshalRead(bytes.NewReader(data), &coAuthors); err != nil {
-			return nil, err
-		}
+		return CoAuthors{}, nil
+	}
+
+	var coAuthors CoAuthors
+	if err = json.UnmarshalRead(bytes.NewReader(data), &coAuthors); err != nil {
+		return nil, err
 	}
 
 	return coAuthors, nil

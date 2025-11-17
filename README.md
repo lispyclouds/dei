@@ -4,7 +4,7 @@ This is a (growing and evolving) collection of useful CLI tools that I used pret
 
 ## The name
 
-Dei, or the informal way to call someone with a "Hey" (more [info](https://www.quora.com/What-does-the-Tamil-word-dei-mean-What-are-the-other-such-words-which-we-can-understand-only-by-slang-What-is-an-easy-way-to-learn-to-speak-Tamil)) is something that was common when I come from and it happens to also align with my last name "De".
+Dei, or the informal way to call someone with a "Hey" (more [info](https://www.quora.com/What-does-the-Tamil-word-dei-mean-What-are-the-other-such-words-which-we-can-understand-only-by-slang-What-is-an-easy-way-to-learn-to-speak-Tamil)) is something that was common where I come from and it happens to also align with my last name "De".
 So whenever someone wanted something, `dei/de` became the de-facto standard to ask me, specially by close friends, something that I truly cherish.
 Since I essentially wanted "myself in code" its only natural to call this tool `dei`.
 

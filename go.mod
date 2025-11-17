@@ -5,7 +5,7 @@ go 1.25
 require (
 	github.com/charmbracelet/huh v0.8.0
 	github.com/stretchr/testify v1.11.1
-	github.com/urfave/cli/v3 v3.6.0
+	github.com/urfave/cli/v3 v3.6.1
 	go.etcd.io/bbolt v1.4.3
 	golang.org/x/crypto v0.44.0
 )
@@ -25,7 +25,7 @@ require (
 	github.com/charmbracelet/x/exp/strings v0.0.0-20251114205511-64e30b5ee1c5 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
 	github.com/charmbracelet/x/xpty v0.1.3 // indirect
-	github.com/clipperhouse/displaywidth v0.5.0 // indirect
+	github.com/clipperhouse/displaywidth v0.6.0 // indirect
 	github.com/clipperhouse/stringish v0.1.1 // indirect
 	github.com/clipperhouse/uax29/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

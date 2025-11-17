@@ -70,67 +70,7 @@ func PwdCmd(cache *pkg.Cache) *cli.Command {
 			},
 		},
 		Action: func(_ context.Context, cmd *cli.Command) error {
-			var (
-				key       []byte
-				identicon string
-			)
-			keyCacheKey, identiconCacheKey := "dei.password.mainKey", "dei.password.identicon"
-
-			key, err := cache.Get(keyCacheKey)
-			if err != nil {
-				return err
-			}
-
-			cachedIdenticon, err := cache.Get(identiconCacheKey)
-			if err != nil {
-				return err
-			}
-
-			if cachedIdenticon != nil {
-				identicon = string(cachedIdenticon)
-			}
-
-			fullName := cmd.String("full-name")
-			variant := SiteVariant(cmd.String("variant"))
-
-			if cmd.Bool("flush-cache") || key == nil || cachedIdenticon == nil {
-				mainPass, err := pkg.Input("Enter your main password", "", true)
-				if err != nil {
-					return err
-				}
-
-				identicon, err = identiconOf(fullName, mainPass)
-				if err != nil {
-					return err
-				}
-
-				key, err = mainKey(fullName, mainPass, variant)
-				if err != nil {
-					return err
-				}
-
-				if err = cache.Put(keyCacheKey, key); err != nil {
-					return err
-				}
-
-				if err = cache.Put(identiconCacheKey, []byte(identicon)); err != nil {
-					return err
-				}
-			}
-
-			pass, err := password(key, cmd.String("site"), cmd.Int("counter"), variant, TemplateClass(cmd.String("class")))
-			if err != nil {
-				return err
-			}
-
-			fmt.Println(identicon)
-
-			if !cmd.Bool("to-clipboard") {
-				fmt.Println(pass)
-				return nil
-			}
-
-			return pkg.CopyToClipboard(pass)
+			return generate(cache, cmd)
 		},
 	}
 }
