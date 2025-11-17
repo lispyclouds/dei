@@ -17,7 +17,7 @@ func run(cmd string, args ...string) (string, error) {
 	out, err := exec.Command(cmd, args...).CombinedOutput()
 	if err != nil {
 		slog.Error("Error running command", "cmd", cmd, "args", args)
-		fmt.Println(out)
+		fmt.Println(string(out))
 
 		return "", err
 	}
@@ -55,9 +55,13 @@ func commit(cache *pkg.Cache) error {
 		feat = string(cachedFeat)
 	}
 
-	feat, err = pkg.Input("Feature", feat, false)
+	featResp, err := pkg.Input("Feature", feat, false)
 	if err != nil {
 		return err
+	}
+
+	if len(featResp) > 0 {
+		feat = featResp
 	}
 
 	summary, err := pkg.Input("Summary", "", false)
