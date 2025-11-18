@@ -20,46 +20,52 @@ type Sites = map[string]SiteInfo
 
 const sitesCacheKey = "dei.password.sites"
 
-func getVariant(site string, sites Sites, cmd *cli.Command) SiteVariant {
+func getVariant(noCache bool, site string, sites Sites, cmd *cli.Command) SiteVariant {
 	variant := SiteVariant(cmd.String("variant"))
 
 	if cmd.IsSet("variant") {
 		return variant
 	}
 
-	info, ok := sites[site]
-	if ok {
-		return info.Variant
+	if !noCache {
+		info, ok := sites[site]
+		if ok {
+			return info.Variant
+		}
 	}
 
 	return variant
 }
 
-func getClass(site string, sites Sites, cmd *cli.Command) TemplateClass {
+func getClass(noCache bool, site string, sites Sites, cmd *cli.Command) TemplateClass {
 	class := TemplateClass(cmd.String("class"))
 
 	if cmd.IsSet("class") {
 		return class
 	}
 
-	info, ok := sites[site]
-	if ok {
-		return info.Class
+	if !noCache {
+		info, ok := sites[site]
+		if ok {
+			return info.Class
+		}
 	}
 
 	return class
 }
 
-func getCounter(site string, sites Sites, cmd *cli.Command) int {
+func getCounter(noCache bool, site string, sites Sites, cmd *cli.Command) int {
 	counter := cmd.Int("counter")
 
 	if cmd.IsSet("counter") {
 		return counter
 	}
 
-	info, ok := sites[site]
-	if ok {
-		return info.Counter
+	if !noCache {
+		info, ok := sites[site]
+		if ok {
+			return info.Counter
+		}
 	}
 
 	return counter
@@ -92,45 +98,52 @@ func cacheSite(cache *pkg.Cache, site string, sites Sites, info SiteInfo) error 
 
 func generate(cache *pkg.Cache, cmd *cli.Command) error {
 	var (
-		key       []byte
+		key       []byte = nil
 		identicon string
 	)
 	keyCacheKey := "dei.password.mainKey"
 	identiconCacheKey := "dei.password.identicon"
 	sites := Sites{}
+	noCache := cmd.Bool("no-cache")
 
-	key, err := cache.Get(keyCacheKey)
-	if err != nil {
-		return err
-	}
-
-	cachedIdenticon, err := cache.Get(identiconCacheKey)
-	if err != nil {
-		return err
-	}
-
-	if cachedIdenticon != nil {
-		identicon = string(cachedIdenticon)
-	}
-
-	cachedSites, err := cache.Get(sitesCacheKey)
-	if err != nil {
-		return err
-	}
-
-	if cachedSites != nil {
-		if err = json.UnmarshalRead(bytes.NewReader(cachedSites), &sites); err != nil {
+	if !noCache {
+		cachedKey, err := cache.Get(keyCacheKey)
+		if err != nil {
 			return err
+		}
+
+		if cachedKey != nil {
+			key = cachedKey
+		}
+
+		cachedIdenticon, err := cache.Get(identiconCacheKey)
+		if err != nil {
+			return err
+		}
+
+		if cachedIdenticon != nil {
+			identicon = string(cachedIdenticon)
+		}
+
+		cachedSites, err := cache.Get(sitesCacheKey)
+		if err != nil {
+			return err
+		}
+
+		if cachedSites != nil {
+			if err = json.UnmarshalRead(bytes.NewReader(cachedSites), &sites); err != nil {
+				return err
+			}
 		}
 	}
 
 	fullName := cmd.String("full-name")
 	site := cmd.String("site")
-	variant := getVariant(site, sites, cmd)
-	class := getClass(site, sites, cmd)
-	counter := getCounter(site, sites, cmd)
+	variant := getVariant(noCache, site, sites, cmd)
+	class := getClass(noCache, site, sites, cmd)
+	counter := getCounter(noCache, site, sites, cmd)
 
-	if cmd.Bool("flush-cache") || key == nil || cachedIdenticon == nil {
+	if cmd.Bool("flush-cache") || key == nil || len(identicon) == 0 {
 		mainPass, err := pkg.Input("Enter your main password", "", true)
 		if err != nil {
 			return err
@@ -146,12 +159,14 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 			return err
 		}
 
-		if err = cache.
-			WithWriteTxn().
-			Put(keyCacheKey, key).
-			Put(identiconCacheKey, []byte(identicon)).
-			Run(); err != nil {
-			return err
+		if !noCache {
+			if err = cache.
+				WithWriteTxn().
+				Put(keyCacheKey, key).
+				Put(identiconCacheKey, []byte(identicon)).
+				Run(); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -160,13 +175,15 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 		return err
 	}
 
-	if err = cacheSite(
-		cache,
-		site,
-		sites,
-		SiteInfo{Counter: counter, Class: class, Variant: variant},
-	); err != nil {
-		return err
+	if !noCache {
+		if err = cacheSite(
+			cache,
+			site,
+			sites,
+			SiteInfo{Counter: counter, Class: class, Variant: variant},
+		); err != nil {
+			return err
+		}
 	}
 
 	fmt.Println(identicon)

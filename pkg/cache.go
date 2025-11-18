@@ -86,7 +86,7 @@ func (wtx *WriteTxn) Put(k string, v []byte) *WriteTxn {
 }
 
 func (wtx *WriteTxn) Run() error {
-	return wtx.cache.db.Update(func(tx *bbolt.Tx) error {
+	return wtx.cache.db.Batch(func(tx *bbolt.Tx) error {
 		for _, pair := range wtx.pairs {
 			if err := tx.Bucket(wtx.cache.bucket).Put([]byte(pair.k), pair.v); err != nil {
 				return err

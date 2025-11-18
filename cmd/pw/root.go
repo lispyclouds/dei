@@ -68,6 +68,11 @@ func PwdCmd(cache *pkg.Cache) *cli.Command {
 				Usage: "Copy the password to clipboard instead of displaying",
 				Value: false,
 			},
+			&cli.BoolFlag{
+				Name:  "no-cache",
+				Usage: "Ignore all cache reads and writes for this session",
+				Value: false,
+			},
 		},
 		Action: func(_ context.Context, cmd *cli.Command) error {
 			return generate(cache, cmd)

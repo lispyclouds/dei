@@ -28,8 +28,8 @@ github.com/charmbracelet/x/errors v0.0.0-20251110184232-6ab307057ac7 h1:4EG8pCHK
 github.com/charmbracelet/x/errors v0.0.0-20251110184232-6ab307057ac7/go.mod h1:O2BTD/aMVQDmrvqroIO3fB6zXUuU07ZpVt21QTmZjRg=
 github.com/charmbracelet/x/exp/golden v0.0.0-20251110184232-6ab307057ac7 h1:QVZbUa1VvnlX/Ij+mc6lRsYeEII1h3sNooP85fDmmjA=
 github.com/charmbracelet/x/exp/golden v0.0.0-20251110184232-6ab307057ac7/go.mod h1:V8n/g3qVKNxr2FR37Y+otCsMySvZr601T0C7coEP0bw=
-github.com/charmbracelet/x/exp/strings v0.0.0-20251114205511-64e30b5ee1c5 h1:mV10jOm1+nkt6e23maPI/uYjjztZh/vUCaEPIku5RGI=
-github.com/charmbracelet/x/exp/strings v0.0.0-20251114205511-64e30b5ee1c5/go.mod h1:/ehtMPNh9K4odGFkqYJKpIYyePhdp1hLBRvyY4bWkH8=
+github.com/charmbracelet/x/exp/strings v0.0.0-20251117171329-74ce264f24fc h1:15qOd2k8Z/VpzqDpCVmH5aj6NZ7XuxonwqV2sxXCWxU=
+github.com/charmbracelet/x/exp/strings v0.0.0-20251117171329-74ce264f24fc/go.mod h1:/ehtMPNh9K4odGFkqYJKpIYyePhdp1hLBRvyY4bWkH8=
 github.com/charmbracelet/x/term v0.2.2 h1:xVRT/S2ZcKdhhOuSP4t5cLi5o+JxklsoEObBSgfgZRk=
 github.com/charmbracelet/x/term v0.2.2/go.mod h1:kF8CY5RddLWrsgVwpw4kAa6TESp6EB5y3uxGLeCqzAI=
 github.com/charmbracelet/x/termios v0.1.1 h1:o3Q2bT8eqzGnGPOYheoYS8eEleT5ZVNYNy8JawjaNZY=

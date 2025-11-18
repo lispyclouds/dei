@@ -27,7 +27,7 @@ TODO: Release versioned binaries
 In my (not so humble) opinion, passwords should:
 
 - Not need me to remember more than one main password
-- Be managed by a password manager which:
+- Be managed by a tool which:
   - Is open source
   - Simple
   - Stateless
@@ -39,10 +39,20 @@ In my (not so humble) opinion, passwords should:
 
 dei implements v3 of the [algorithm](https://spectre.app/spectre-algorithm.pdf) along with an intuitive UX that I think is useful to all users. It implements aggressive caching to speedup the whole process and is optimised to be simple and nimble. Run `dei pw --help` to see all the options.
 
+**Caveat: By default, dei saves the intermeidate scrypt digest to the db as a caching mechanism which also means its there on your local disk UNSECURED. Approaches like PIN encryption, FIDO/hardware token auth etc are being explored for this to mitigate it. Pass --no-cache to opt out and keep the session ephemeral.**
+
 Generate a password for a site, eg: github.com
 
 ```bash
 dei pw --full-name "Your Full Name" --site "github.com" # pass --to-clipboard to directly copy to clipboard
+```
+
+As mentioned in the algorithm paper, spectre takes in optional parameters like --counter, --class and --variant.
+All these options have a default value and when dei encounters a new site, it saves these values to an internal DB and used from there subsequently.
+If there is a need to update them, eg --counter 2, pass these explicitly on the CLI and dei with notice the diff and update.
+
+```bash
+dei pw --full-name "Full Name" --site "github.com" --counter 3 --class long # update the saved counter and password class
 ```
 
 #### Crafting conventional commits
