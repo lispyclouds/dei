@@ -11,8 +11,15 @@ func CommitCmd(cache *pkg.Cache) *cli.Command {
 	return &cli.Command{
 		Name:  "commit",
 		Usage: "Committed companion",
-		Action: func(_ context.Context, _ *cli.Command) error {
-			return commit(cache)
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:  "short",
+				Usage: "Set this to omit the extended commit message",
+				Value: false,
+			},
+		},
+		Action: func(_ context.Context, cmd *cli.Command) error {
+			return commit(cache, cmd)
 		},
 		Commands: []*cli.Command{
 			{

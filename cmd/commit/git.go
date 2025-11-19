@@ -9,6 +9,7 @@ import (
 
 	"github.com/charmbracelet/huh"
 	"github.com/lispyclouds/dei/pkg"
+	"github.com/urfave/cli/v3"
 )
 
 // TODO: Use go-git when
@@ -38,7 +39,7 @@ func preChecks() error {
 	return nil
 }
 
-func commit(cache *pkg.Cache) error {
+func commit(cache *pkg.Cache, cmd *cli.Command) error {
 	if err := preChecks(); err != nil {
 		return err
 	}
@@ -70,18 +71,21 @@ func commit(cache *pkg.Cache) error {
 	}
 
 	var extendedCommitMsg string
-	if err = huh.NewForm(
-		huh.NewGroup(
-			huh.NewText().
-				Title("Extended Commit Message").
-				Value(&extendedCommitMsg),
-		),
-	).Run(); err != nil {
-		return err
-	}
 
-	if len(extendedCommitMsg) > 0 {
-		extendedCommitMsg = "\n\n" + extendedCommitMsg
+	if !cmd.Bool("short") {
+		if err = huh.NewForm(
+			huh.NewGroup(
+				huh.NewText().
+					Title("Extended Commit Message").
+					Value(&extendedCommitMsg),
+			),
+		).Run(); err != nil {
+			return err
+		}
+
+		if len(extendedCommitMsg) > 0 {
+			extendedCommitMsg = "\n\n" + extendedCommitMsg
+		}
 	}
 
 	coAuthors, err := loadCoAuthors(cache)
