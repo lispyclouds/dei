@@ -5,6 +5,8 @@ import (
 	json "encoding/json/v2"
 	"fmt"
 	"log/slog"
+	"net/url"
+	"strings"
 
 	"github.com/lispyclouds/dei/pkg"
 	"github.com/urfave/cli/v3"
@@ -96,6 +98,16 @@ func cacheSite(cache *pkg.Cache, site string, sites Sites, info SiteInfo) error 
 	return cache.Put(sitesCacheKey, buffer.Bytes())
 }
 
+func onlyHosts(site string) string {
+	parsed, err := url.Parse(site)
+	if err != nil || len(parsed.Hostname()) == 0 {
+		slog.Warn("Cannot parse hostnam, using as is", "site", site)
+		return site
+	}
+
+	return strings.TrimPrefix(parsed.Hostname(), "www.")
+}
+
 func generate(cache *pkg.Cache, cmd *cli.Command) error {
 	var (
 		key       []byte = nil
@@ -137,8 +149,9 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 		}
 	}
 
-	fullName := cmd.String("full-name")
-	site := cmd.String("site")
+	fullName := strings.TrimSpace(cmd.String("full-name"))
+	site := onlyHosts(strings.TrimSpace(cmd.String("site")))
+
 	variant := getVariant(noCache, site, sites, cmd)
 	class := getClass(noCache, site, sites, cmd)
 	counter := getCounter(noCache, site, sites, cmd)

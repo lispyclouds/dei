@@ -47,6 +47,8 @@ Generate a password for a site, eg: github.com
 dei pw --full-name "Your Full Name" --site "github.com" # pass --to-clipboard to directly copy to clipboard
 ```
 
+It's recommended to pass the base host name to --site without the protocols, www, paths etc. dei will do a best effort extraction of the host from what is passed but will pass through if it can't.
+
 As mentioned in the algorithm paper, spectre takes in optional parameters like --counter, --class and --variant.
 All these options have a default value and when dei encounters a new site, it saves these values to an internal DB and used from there subsequently.
 If there is a need to update them, eg --counter 2, pass these explicitly on the CLI and dei with notice the diff and update.

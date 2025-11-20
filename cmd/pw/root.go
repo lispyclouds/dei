@@ -14,6 +14,9 @@ func PwdCmd(cache *pkg.Cache) *cli.Command {
 		Name:    "pw",
 		Aliases: []string{"pwd", "pass", "password"},
 		Usage:   "Stateless passwords",
+		Action: func(_ context.Context, cmd *cli.Command) error {
+			return generate(cache, cmd)
+		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "full-name",
@@ -73,9 +76,6 @@ func PwdCmd(cache *pkg.Cache) *cli.Command {
 				Usage: "Ignore all cache reads and writes for this session",
 				Value: false,
 			},
-		},
-		Action: func(_ context.Context, cmd *cli.Command) error {
-			return generate(cache, cmd)
 		},
 	}
 }
