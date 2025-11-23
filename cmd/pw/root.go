@@ -9,25 +9,18 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
+var siteFlag *cli.StringFlag = &cli.StringFlag{
+	Name:     "site",
+	Usage:    "The site",
+	Required: true,
+}
+
 func PwdCmd(cache *pkg.Cache) *cli.Command {
 	return &cli.Command{
 		Name:    "pw",
 		Aliases: []string{"pwd", "pass", "password"},
 		Usage:   "Stateless passwords",
-		Action: func(_ context.Context, cmd *cli.Command) error {
-			return generate(cache, cmd)
-		},
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "full-name",
-				Usage:    "Your full name",
-				Required: true,
-			},
-			&cli.StringFlag{
-				Name:     "site",
-				Usage:    "The site for the password",
-				Required: true,
-			},
 			&cli.IntFlag{
 				Name:  "counter",
 				Usage: "The current counter/generation of the credential",
@@ -75,6 +68,53 @@ func PwdCmd(cache *pkg.Cache) *cli.Command {
 				Name:  "no-cache",
 				Usage: "Ignore all cache reads and writes for this session",
 				Value: false,
+			},
+		},
+		Commands: []*cli.Command{
+			{
+				Name:    "gen",
+				Aliases: []string{"generate"},
+				Usage:   "Generate a password",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "full-name",
+						Usage:    "Your full name",
+						Required: true,
+					},
+					siteFlag,
+				},
+				Action: func(_ context.Context, cmd *cli.Command) error {
+					return generate(cache, cmd)
+				},
+			},
+			{
+				Name:  "site-cache",
+				Usage: "Manage the site metadata cache",
+				Commands: []*cli.Command{
+					{
+						Name:  "put",
+						Usage: "Put/Edit values of a site",
+						Flags: []cli.Flag{siteFlag},
+						Action: func(_ context.Context, cmd *cli.Command) error {
+							return cachePut(cache, cmd)
+						},
+					},
+					{
+						Name:  "remove",
+						Usage: "Remove a site",
+						Flags: []cli.Flag{siteFlag},
+						Action: func(_ context.Context, cmd *cli.Command) error {
+							return cacheRemove(cache, cmd)
+						},
+					},
+					{
+						Name:  "show",
+						Usage: "Show all cached site metadata",
+						Action: func(_ context.Context, cmd *cli.Command) error {
+							return cacheShow(cache)
+						},
+					},
+				},
 			},
 		},
 	}

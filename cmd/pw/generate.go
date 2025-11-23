@@ -1,8 +1,6 @@
 package pw
 
 import (
-	"bytes"
-	json "encoding/json/v2"
 	"fmt"
 	"log/slog"
 	"net/url"
@@ -19,8 +17,6 @@ type SiteInfo struct {
 }
 
 type Sites = map[string]SiteInfo
-
-const sitesCacheKey = "dei.password.sites"
 
 func getVariant(noCache bool, site string, sites Sites, cmd *cli.Command) SiteVariant {
 	variant := SiteVariant(cmd.String("variant"))
@@ -90,12 +86,8 @@ func cacheSite(cache *pkg.Cache, site string, sites Sites, info SiteInfo) error 
 	}
 
 	sites[site] = info
-	buffer := bytes.NewBuffer([]byte{})
-	if err := json.MarshalWrite(buffer, &sites); err != nil {
-		return err
-	}
 
-	return cache.Put(sitesCacheKey, buffer.Bytes())
+	return saveSites(cache, sites)
 }
 
 func onlyHosts(site string) string {
@@ -137,15 +129,9 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 			identicon = string(cachedIdenticon)
 		}
 
-		cachedSites, err := cache.Get(sitesCacheKey)
+		sites, err = loadSites(cache)
 		if err != nil {
 			return err
-		}
-
-		if cachedSites != nil {
-			if err = json.UnmarshalRead(bytes.NewReader(cachedSites), &sites); err != nil {
-				return err
-			}
 		}
 	}
 

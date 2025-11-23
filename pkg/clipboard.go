@@ -8,12 +8,6 @@ import (
 	"slices"
 )
 
-var conf map[string]map[string][]string = map[string]map[string][]string{
-	"linux":   {"wl-copy": {}, "xsel": {"-ib"}, "xclip": {}},
-	"darwin":  {"pbcopy": {}},
-	"windows": {"clip": {}},
-}
-
 func getCopyCmd(tools map[string][]string) (*exec.Cmd, error) {
 	for tool, args := range tools {
 		if _, err := exec.LookPath(tool); err == nil {
@@ -25,6 +19,12 @@ func getCopyCmd(tools map[string][]string) (*exec.Cmd, error) {
 }
 
 func CopyToClipboard(data string) error {
+	conf := map[string]map[string][]string{
+		"linux":   {"wl-copy": {}, "xsel": {"-ib"}, "xclip": {}},
+		"darwin":  {"pbcopy": {}},
+		"windows": {"clip": {}},
+	}
+
 	tools, ok := conf[runtime.GOOS]
 	if !ok {
 		return fmt.Errorf("Unsupported OS: %s", runtime.GOOS)

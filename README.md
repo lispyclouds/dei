@@ -44,7 +44,7 @@ dei implements v3 of the [algorithm](https://spectre.app/spectre-algorithm.pdf) 
 Generate a password for a site, eg: github.com
 
 ```bash
-dei pw --full-name "Your Full Name" --site "github.com" # pass --to-clipboard to directly copy to clipboard
+dei pw gen --full-name "Your Full Name" --site "github.com" # pass --to-clipboard to directly copy to clipboard
 ```
 
 It's recommended to pass the base host name to --site without the protocols, www, paths etc. dei will do a best effort extraction of the host from what is passed but will pass through if it can't.
@@ -54,8 +54,12 @@ All these options have a default value and when dei encounters a new site, it sa
 If there is a need to update them, eg --counter 2, pass these explicitly on the CLI and dei with notice the diff and update.
 
 ```bash
-dei pw --full-name "Full Name" --site "github.com" --counter 3 --class long # update the saved counter and password class
+dei pw gen --full-name "Full Name" --site "github.com" --counter 3 --class long # update the saved counter and password class
 ```
+
+Site metadata cache
+
+dei caches things quite aggressively to improve both performance and UX. Sometimes 💩 happens or you may need to manually tweak things a bit. For that, take a look at `dei pw site-cache --help` to manually step in during these trying times.
 
 #### Crafting conventional commits
 
