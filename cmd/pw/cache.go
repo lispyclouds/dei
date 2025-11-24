@@ -19,6 +19,10 @@ func loadSites(cache *pkg.Cache) (Sites, error) {
 		return nil, err
 	}
 
+	if cachedSites == nil {
+		return Sites{}, nil
+	}
+
 	var sites Sites
 	if err = json.UnmarshalRead(bytes.NewReader(cachedSites), &sites); err != nil {
 		return nil, err
