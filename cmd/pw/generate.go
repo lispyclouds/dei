@@ -1,6 +1,7 @@
 package pw
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/url"
@@ -93,7 +94,7 @@ func cacheSite(cache *pkg.Cache, site string, sites Sites, info SiteInfo) error 
 func onlyHosts(site string) string {
 	parsed, err := url.Parse(site)
 	if err != nil || len(parsed.Hostname()) == 0 {
-		slog.Warn("Cannot parse hostnam, using as is", "site", site)
+		slog.Warn("Cannot parse hostname, using as is", "site", site)
 		return site
 	}
 
@@ -109,6 +110,9 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 	identiconCacheKey := "dei.password.identicon"
 	sites := Sites{}
 	noCache := cmd.Bool("no-cache")
+	cacheSecurityScheme := cmd.String("cache-security-scheme")
+	flushCache := cmd.Bool("flush-cache")
+	var cryptoKey []byte
 
 	if !noCache {
 		cachedKey, err := cache.Get(keyCacheKey)
@@ -116,8 +120,20 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 			return err
 		}
 
-		if cachedKey != nil {
-			key = cachedKey
+		if !flushCache && cachedKey != nil {
+			if cacheSecurityScheme == "pin" {
+				pin, err := pkg.Input("Enter the PIN", "", true)
+				if err != nil {
+					return err
+				}
+
+				cryptoKey = []byte(pin)
+
+				key, err = decrypt(cachedKey, cryptoKey)
+				if err != nil {
+					return fmt.Errorf("%s: either wrong PIN or data is corrupted", err)
+				}
+			}
 		}
 
 		cachedIdenticon, err := cache.Get(identiconCacheKey)
@@ -137,12 +153,11 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 
 	fullName := strings.TrimSpace(cmd.String("full-name"))
 	site := onlyHosts(strings.TrimSpace(cmd.String("site")))
-
 	variant := getVariant(noCache, site, sites, cmd)
 	class := getClass(noCache, site, sites, cmd)
 	counter := getCounter(noCache, site, sites, cmd)
 
-	if cmd.Bool("flush-cache") || key == nil || len(identicon) == 0 {
+	if flushCache || key == nil || len(identicon) == 0 {
 		mainPass, err := pkg.Input("Enter your main password", "", true)
 		if err != nil {
 			return err
@@ -159,12 +174,37 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 		}
 
 		if !noCache {
-			if err = cache.
-				WithWriteTxn().
-				Put(keyCacheKey, key).
-				Put(identiconCacheKey, []byte(identicon)).
-				Run(); err != nil {
-				return err
+			if cacheSecurityScheme == "pin" {
+				if cryptoKey == nil {
+					pin, err := pkg.Input("Enter the PIN", "", true)
+					if err != nil {
+						return err
+					}
+
+					pin_again, err := pkg.Input("Re-enter the PIN", "", true)
+					if err != nil {
+						return err
+					}
+
+					if pin != pin_again {
+						return errors.New("Both pins don't match")
+					}
+
+					cryptoKey = []byte(pin)
+				}
+
+				secureKey, err := encrypt(key, cryptoKey)
+				if err != nil {
+					return err
+				}
+
+				if err = cache.
+					WithWriteTxn().
+					Put(keyCacheKey, secureKey).
+					Put(identiconCacheKey, []byte(identicon)).
+					Run(); err != nil {
+					return err
+				}
 			}
 		}
 	}

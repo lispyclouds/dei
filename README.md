@@ -39,7 +39,7 @@ In my (not so humble) opinion, passwords should:
 
 dei implements v3 of the [algorithm](https://spectre.app/spectre-algorithm.pdf) along with an intuitive UX that I think is useful to all users. It implements aggressive caching to speedup the whole process and is optimised to be simple and nimble. Run `dei pw --help` to see all the options.
 
-**Caveat: By default, dei saves the intermeidate scrypt digest to the db as a caching mechanism which also means its there on your local disk UNSECURED. Approaches like PIN encryption, FIDO/hardware token auth etc are being explored for this to mitigate it. Pass --no-cache to opt out and keep the session ephemeral.**
+dei caches the main password by encrypting it with a upto 32 char long PIN with AES_128_GCM. Upon subsequent invocations, the PIN will be prompted for. To reset the PIN or change the cached main password pass the `--flush-cache` option. Also can pass `--no-cache` to make the session ephemeral.
 
 Generate a password for a site, eg: github.com
 

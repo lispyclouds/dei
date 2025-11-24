@@ -83,6 +83,7 @@ func cacheRemove(cache *pkg.Cache, cmd *cli.Command) error {
 		return saveSites(cache, sites)
 	}
 
+	slog.Warn("No such site", "site", site)
 	return nil
 }
 

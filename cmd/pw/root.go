@@ -59,16 +59,6 @@ func PwdCmd(cache *pkg.Cache) *cli.Command {
 					return nil
 				},
 			},
-			&cli.BoolFlag{
-				Name:  "to-clipboard",
-				Usage: "Copy the password to clipboard instead of displaying",
-				Value: false,
-			},
-			&cli.BoolFlag{
-				Name:  "no-cache",
-				Usage: "Ignore all cache reads and writes for this session",
-				Value: false,
-			},
 		},
 		Commands: []*cli.Command{
 			{
@@ -82,6 +72,29 @@ func PwdCmd(cache *pkg.Cache) *cli.Command {
 						Required: true,
 					},
 					siteFlag,
+					&cli.BoolFlag{
+						Name:  "to-clipboard",
+						Usage: "Copy the password to clipboard instead of displaying",
+						Value: false,
+					},
+					&cli.BoolFlag{
+						Name:  "no-cache",
+						Usage: "Ignore all cache reads and writes for this session",
+						Value: false,
+					},
+					&cli.StringFlag{
+						Name:  "cache-security-scheme",
+						Usage: "The method used to secure the cached main password",
+						Value: "pin",
+						Validator: func(v string) error {
+							allowed := []string{"pin"}
+							if !slices.Contains(allowed, v) {
+								return fmt.Errorf("Choose from %v", allowed)
+							}
+
+							return nil
+						},
+					},
 				},
 				Action: func(_ context.Context, cmd *cli.Command) error {
 					return generate(cache, cmd)
