@@ -19,8 +19,9 @@ func main() {
 	defer cache.Close()
 
 	cmd := cli.Command{
-		Name:  "dei",
-		Usage: "me in the CLI",
+		Name:            "dei",
+		Usage:           "me in the CLI",
+		CommandNotFound: pkg.CommandNotFound,
 		Commands: []*cli.Command{
 			pw.PwdCmd(cache),
 			commit.CommitCmd(cache),

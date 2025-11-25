@@ -17,9 +17,10 @@ var siteFlag *cli.StringFlag = &cli.StringFlag{
 
 func PwdCmd(cache *pkg.Cache) *cli.Command {
 	return &cli.Command{
-		Name:    "pw",
-		Aliases: []string{"pwd", "pass", "password"},
-		Usage:   "Stateless passwords",
+		Name:            "pw",
+		Aliases:         []string{"pwd", "pass", "password"},
+		Usage:           "Stateless passwords",
+		CommandNotFound: pkg.CommandNotFound,
 		Flags: []cli.Flag{
 			&cli.IntFlag{
 				Name:  "counter",
@@ -62,9 +63,10 @@ func PwdCmd(cache *pkg.Cache) *cli.Command {
 		},
 		Commands: []*cli.Command{
 			{
-				Name:    "gen",
-				Aliases: []string{"generate"},
-				Usage:   "Generate a password",
+				Name:            "gen",
+				Aliases:         []string{"generate"},
+				Usage:           "Generate a password",
+				CommandNotFound: pkg.CommandNotFound,
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:     "full-name",
@@ -101,28 +103,32 @@ func PwdCmd(cache *pkg.Cache) *cli.Command {
 				},
 			},
 			{
-				Name:  "site-cache",
-				Usage: "Manage the site metadata cache",
+				Name:            "site-cache",
+				Usage:           "Manage the site metadata cache",
+				CommandNotFound: pkg.CommandNotFound,
 				Commands: []*cli.Command{
 					{
-						Name:  "put",
-						Usage: "Put/Edit values of a site",
-						Flags: []cli.Flag{siteFlag},
+						Name:            "put",
+						Usage:           "Put/Edit values of a site",
+						CommandNotFound: pkg.CommandNotFound,
+						Flags:           []cli.Flag{siteFlag},
 						Action: func(_ context.Context, cmd *cli.Command) error {
 							return cachePut(cache, cmd)
 						},
 					},
 					{
-						Name:  "remove",
-						Usage: "Remove a site",
-						Flags: []cli.Flag{siteFlag},
+						Name:            "remove",
+						Usage:           "Remove a site",
+						CommandNotFound: pkg.CommandNotFound,
+						Flags:           []cli.Flag{siteFlag},
 						Action: func(_ context.Context, cmd *cli.Command) error {
 							return cacheRemove(cache, cmd)
 						},
 					},
 					{
-						Name:  "show",
-						Usage: "Show all cached site metadata",
+						Name:            "show",
+						Usage:           "Show all cached site metadata",
+						CommandNotFound: pkg.CommandNotFound,
 						Action: func(_ context.Context, cmd *cli.Command) error {
 							return cacheShow(cache)
 						},

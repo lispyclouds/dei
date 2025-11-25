@@ -1,6 +1,12 @@
 package pkg
 
-import "github.com/charmbracelet/huh"
+import (
+	"context"
+	"log/slog"
+
+	"github.com/charmbracelet/huh"
+	"github.com/urfave/cli/v3"
+)
 
 func Input(prompt, placeholder string, noEcho bool) (string, error) {
 	var response string
@@ -20,4 +26,9 @@ func Input(prompt, placeholder string, noEcho bool) (string, error) {
 	}
 
 	return response, nil
+}
+
+func CommandNotFound(_ context.Context, cmd *cli.Command, command string) {
+	slog.Error("Unknown command", "command", command)
+	cli.ShowSubcommandHelpAndExit(cmd, 1)
 }

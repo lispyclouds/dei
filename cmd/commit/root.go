@@ -9,8 +9,9 @@ import (
 
 func CommitCmd(cache *pkg.Cache) *cli.Command {
 	return &cli.Command{
-		Name:  "commit",
-		Usage: "Committed companion",
+		Name:            "commit",
+		Usage:           "Committed companion",
+		CommandNotFound: pkg.CommandNotFound,
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:  "short",
@@ -23,12 +24,14 @@ func CommitCmd(cache *pkg.Cache) *cli.Command {
 		},
 		Commands: []*cli.Command{
 			{
-				Name:  "co-authors",
-				Usage: "Manage co-authors",
+				Name:            "co-authors",
+				Usage:           "Manage co-authors",
+				CommandNotFound: pkg.CommandNotFound,
 				Commands: []*cli.Command{
 					{
-						Name:  "add",
-						Usage: "Add a co-author",
+						Name:            "add",
+						Usage:           "Add a co-author",
+						CommandNotFound: pkg.CommandNotFound,
 						Action: func(_ context.Context, cmd *cli.Command) error {
 							return manageCoAuthor(cache, cmd.String("name"), cmd.String("email"), "add")
 						},
@@ -46,8 +49,9 @@ func CommitCmd(cache *pkg.Cache) *cli.Command {
 						},
 					},
 					{
-						Name:  "remove",
-						Usage: "Remove a co-author",
+						Name:            "remove",
+						Usage:           "Remove a co-author",
+						CommandNotFound: pkg.CommandNotFound,
 						Action: func(_ context.Context, cmd *cli.Command) error {
 							return manageCoAuthor(cache, cmd.String("name"), cmd.String("email"), "remove")
 						},
@@ -60,8 +64,9 @@ func CommitCmd(cache *pkg.Cache) *cli.Command {
 						},
 					},
 					{
-						Name:  "list",
-						Usage: "List all co-authors",
+						Name:            "list",
+						CommandNotFound: pkg.CommandNotFound,
+						Usage:           "List all co-authors",
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return listCoAuthors(cache)
 						},
