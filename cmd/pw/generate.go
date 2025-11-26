@@ -103,10 +103,10 @@ func onlyHosts(site string) string {
 
 func generate(cache *pkg.Cache, cmd *cli.Command) error {
 	var (
-		key       []byte = nil
+		mainKey   []byte = nil
 		identicon string
 	)
-	keyCacheKey := "dei.password.mainKey"
+	mainKeyCacheKey := "dei.password.mainKey"
 	identiconCacheKey := "dei.password.identicon"
 	sites := Sites{}
 	noCache := cmd.Bool("no-cache")
@@ -115,12 +115,12 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 	var cryptoKey []byte
 
 	if !noCache {
-		cachedKey, err := cache.Get(keyCacheKey)
+		cachedMainKey, err := cache.Get(mainKeyCacheKey)
 		if err != nil {
 			return err
 		}
 
-		if !flushCache && cachedKey != nil {
+		if !flushCache && cachedMainKey != nil {
 			if cacheSecurityScheme == "pin" {
 				pin, err := pkg.Input("Enter the PIN", "", true)
 				if err != nil {
@@ -129,7 +129,7 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 
 				cryptoKey = []byte(pin)
 
-				key, err = decrypt(cachedKey, cryptoKey)
+				mainKey, err = decrypt(cachedMainKey, cryptoKey)
 				if err != nil {
 					return fmt.Errorf("%s: either wrong PIN or data is corrupted", err)
 				}
@@ -157,7 +157,7 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 	class := getClass(noCache, site, sites, cmd)
 	counter := getCounter(noCache, site, sites, cmd)
 
-	if flushCache || key == nil || len(identicon) == 0 {
+	if flushCache || mainKey == nil || len(identicon) == 0 {
 		mainPass, err := pkg.Input("Enter your main password", "", true)
 		if err != nil {
 			return err
@@ -168,7 +168,7 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 			return err
 		}
 
-		key, err = mainKey(fullName, mainPass, variant)
+		mainKey, err = mainKeyOf(fullName, mainPass, variant)
 		if err != nil {
 			return err
 		}
@@ -193,14 +193,14 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 					cryptoKey = []byte(pin)
 				}
 
-				secureKey, err := encrypt(key, cryptoKey)
+				secureKey, err := encrypt(mainKey, cryptoKey)
 				if err != nil {
 					return err
 				}
 
 				if err = cache.
 					WithWriteTxn().
-					Put(keyCacheKey, secureKey).
+					Put(mainKeyCacheKey, secureKey).
 					Put(identiconCacheKey, []byte(identicon)).
 					Run(); err != nil {
 					return err
@@ -209,7 +209,7 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 		}
 	}
 
-	pass, err := password(key, site, counter, variant, class)
+	pass, err := derivePass(mainKey, site, counter, variant, class)
 	if err != nil {
 		return err
 	}

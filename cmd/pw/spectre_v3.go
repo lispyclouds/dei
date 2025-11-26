@@ -130,7 +130,7 @@ func charFromClass(class byte, seed int) byte {
 	return charSet[seed%len(charSet)]
 }
 
-func mainKey(fullName, mainPass string, siteVariant SiteVariant) ([]byte, error) {
+func mainKeyOf(fullName, mainPass string, siteVariant SiteVariant) ([]byte, error) {
 	buffer := bytes.NewBuffer([]byte{})
 	defer buffer.Reset()
 
@@ -141,7 +141,7 @@ func mainKey(fullName, mainPass string, siteVariant SiteVariant) ([]byte, error)
 	return scrypt.Key([]byte(mainPass), buffer.Bytes(), 32768, 8, 2, 64)
 }
 
-func password(mainKey []byte, site string, counter int, siteVariant SiteVariant, class TemplateClass) (string, error) {
+func derivePass(mainKey []byte, site string, counter int, siteVariant SiteVariant, class TemplateClass) (string, error) {
 	buffer := bytes.NewBuffer([]byte{})
 	defer buffer.Reset()
 
