@@ -91,11 +91,59 @@ func cacheRemove(cache *pkg.Cache, cmd *cli.Command) error {
 	return nil
 }
 
-func cacheShow(cache *pkg.Cache) error {
+func cacheDump(cache *pkg.Cache, cmd *cli.Command) error {
+	writer := os.Stdout
+	if cmd.IsSet("file") {
+		f, err := os.OpenFile(cmd.String("file"), os.O_WRONLY|os.O_CREATE, 0600)
+		if err != nil {
+			return err
+		}
+		writer = f
+		defer f.Close()
+	}
+
 	sites, err := loadSites(cache)
 	if err != nil {
 		return err
 	}
 
-	return json.MarshalWrite(os.Stdout, &sites, jsontext.WithIndent("  "))
+	return json.MarshalWrite(writer, &sites, jsontext.WithIndent("  "))
+}
+
+func cacheImport(cache *pkg.Cache, cmd *cli.Command) error {
+	f, err := os.OpenFile(cmd.String("file"), os.O_RDONLY, 0400)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	var sites Sites
+	if err = json.UnmarshalRead(f, &sites); err != nil {
+		return err
+	}
+
+	cachedSites, err := loadSites(cache)
+	if err != nil {
+		return err
+	}
+
+	// TODO: maybe merge deeper?
+	for site, newValue := range sites {
+		// TODO: Any better way to do defaults?
+		if newValue.Counter == 0 {
+			newValue.Counter = cmd.Int("counter")
+		}
+
+		if newValue.Class == "" {
+			newValue.Class = TemplateClass(cmd.String("class"))
+		}
+
+		if newValue.Variant == "" {
+			newValue.Variant = SiteVariant(cmd.String("variant"))
+		}
+
+		cachedSites[site] = newValue
+	}
+
+	return saveSites(cache, cachedSites)
 }

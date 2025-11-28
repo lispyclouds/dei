@@ -126,11 +126,34 @@ func PwdCmd(cache *pkg.Cache) *cli.Command {
 						},
 					},
 					{
-						Name:            "show",
-						Usage:           "Show all cached site metadata",
+						Name:            "dump",
+						Usage:           "Dump all cached site metadata; to stdout if no file is passed",
 						CommandNotFound: pkg.CommandNotFound,
 						Action: func(_ context.Context, cmd *cli.Command) error {
-							return cacheShow(cache)
+							return cacheDump(cache, cmd)
+						},
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:    "file",
+								Aliases: []string{"f"},
+								Usage:   "The file to dump to",
+							},
+						},
+					},
+					{
+						Name:            "import",
+						Usage:           "Import site metadata merging with the existing ones",
+						CommandNotFound: pkg.CommandNotFound,
+						Action: func(_ context.Context, cmd *cli.Command) error {
+							return cacheImport(cache, cmd)
+						},
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "file",
+								Aliases:  []string{"f"},
+								Usage:    "The JSON file to import from",
+								Required: true,
+							},
 						},
 					},
 				},
