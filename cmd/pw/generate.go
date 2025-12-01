@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/lispyclouds/dei/pkg"
 	"github.com/urfave/cli/v3"
 )
@@ -225,17 +226,28 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 		}
 	}
 
-	fmt.Printf("Site: %s\nIdenticon: %s\n", site, identicon)
+	var sb strings.Builder
+
+	sb.WriteString(fmt.Sprintf("Site: %s\nIdenticon: %s", site, identicon))
 
 	if !cmd.Bool("to-clipboard") {
-		fmt.Printf("Password: %s\n", pass)
-		return nil
+		sb.WriteString(fmt.Sprintf("\nPassword: %s", pass))
+	} else {
+		if err = pkg.CopyToClipboard(pass); err != nil {
+			return err
+		}
+
+		sb.WriteString("\nPassword copied to clipboard")
 	}
 
-	if err = pkg.CopyToClipboard(pass); err != nil {
-		return err
-	}
+	fmt.Println(
+		lipgloss.NewStyle().
+			Width(35).
+			BorderStyle(lipgloss.RoundedBorder()).
+			BorderForeground(lipgloss.Color("63")).
+			Padding(1, 2).
+			Render(sb.String()),
+	)
 
-	fmt.Println("Password copied to clipboard")
 	return nil
 }
