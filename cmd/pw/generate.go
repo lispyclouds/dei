@@ -225,12 +225,17 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 		}
 	}
 
-	fmt.Println(identicon)
+	fmt.Printf("Site: %s\nIdenticon: %s\n", site, identicon)
 
 	if !cmd.Bool("to-clipboard") {
-		fmt.Println(pass)
+		fmt.Printf("Password: %s\n", pass)
 		return nil
 	}
 
-	return pkg.CopyToClipboard(pass)
+	if err = pkg.CopyToClipboard(pass); err != nil {
+		return err
+	}
+
+	fmt.Println("Password copied to clipboard")
+	return nil
 }
