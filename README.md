@@ -39,7 +39,7 @@ In my (not so humble) opinion, passwords should:
 
 dei implements v3 of the [algorithm](https://spectre.app/spectre-algorithm.pdf) along with an intuitive UX that I think is useful to all users. It implements aggressive caching to speedup the whole process and is optimised to be simple and nimble. Run `dei pw --help` to see all the options.
 
-dei caches the main password by encrypting it with a upto 32 char long PIN with AES_128_GCM. Upon subsequent invocations, the PIN will be prompted for. To reset the PIN or change the cached main password pass the `--flush-cache` option. Also can pass `--no-cache` to make the session ephemeral.
+dei caches the main password by encrypting it with a upto 32 char long PIN with AES_256_GCM. Upon subsequent invocations, the PIN will be prompted for. To reset the PIN or change the cached main password pass the `--flush-cache` option. Also can pass `--no-cache` to make the session ephemeral.
 
 Generate a password for a site, eg: github.com
 
@@ -63,11 +63,11 @@ dei caches things quite aggressively to improve both performance and UX. Sometim
 
 #### Crafting conventional commits
 
-[Conventional Commits](https://www.conventionalcommits.org/) are not only a great idea, but is sometimes a mandate in varios projects. Although there are various tools that implement this, I didn't quite like their UX, specially when it comes to caching the right bits to speed not only the tool but your workflow too.
+[Conventional Commits](https://www.conventionalcommits.org/) are not only a great idea, but is sometimes a mandate in various projects. Although there are various tools that implement this, I didn't quite like their UX, specially when it comes to caching the right bits to speed not only the tool but your workflow too.
 
 **This is limited to only Git for now.**
 
-dei just helps in two ways:
+dei helps in two ways:
 
 - help craft the right conventional commit
 - help manage a set of co-authors and help attribute them correctly in the message
