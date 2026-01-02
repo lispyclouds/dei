@@ -115,6 +115,9 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 	flushCache := cmd.Bool("flush-cache")
 	var cryptoKey []byte
 
+	site := onlyHosts(strings.TrimSpace(cmd.String("site")))
+	slog.Info("Generating for", "site", site)
+
 	if !noCache {
 		cachedMainKey, err := cache.Get(mainKeyCacheKey)
 		if err != nil {
@@ -153,7 +156,6 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 	}
 
 	fullName := strings.TrimSpace(cmd.String("full-name"))
-	site := onlyHosts(strings.TrimSpace(cmd.String("site")))
 	variant := getVariant(noCache, site, sites, cmd)
 	class := getClass(noCache, site, sites, cmd)
 	counter := getCounter(noCache, site, sites, cmd)
