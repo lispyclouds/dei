@@ -9,6 +9,7 @@ require (
 	github.com/urfave/cli/v3 v3.6.1
 	go.etcd.io/bbolt v1.4.3
 	golang.org/x/crypto v0.46.0
+	golang.org/x/net v0.48.0
 )
 
 require (

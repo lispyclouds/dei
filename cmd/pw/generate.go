@@ -10,6 +10,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/lispyclouds/dei/pkg"
 	"github.com/urfave/cli/v3"
+	"golang.org/x/net/publicsuffix"
 )
 
 type SiteInfo struct {
@@ -94,12 +95,19 @@ func cacheSite(cache *pkg.Cache, site string, sites Sites, info SiteInfo) error 
 
 func onlyHosts(site string) string {
 	parsed, err := url.Parse(site)
-	if err != nil || len(parsed.Hostname()) == 0 {
+	toExtract := parsed.Hostname()
+	if err != nil || len(toExtract) == 0 {
 		slog.Warn("Cannot parse hostname, using as is", "site", site)
+		toExtract = site
+	}
+
+	host, err := publicsuffix.EffectiveTLDPlusOne(toExtract)
+	if err != nil {
+		slog.Warn("Cannot extract eTLD+1, using as is", "site", site)
 		return site
 	}
 
-	return strings.TrimPrefix(parsed.Hostname(), "www.")
+	return host
 }
 
 func generate(cache *pkg.Cache, cmd *cli.Command) error {
