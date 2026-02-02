@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json/jsontext"
 	json "encoding/json/v2"
-	"log/slog"
 	"os"
 
+	"github.com/charmbracelet/log"
 	"github.com/lispyclouds/dei/pkg"
 	"github.com/urfave/cli/v3"
 )
@@ -56,12 +56,12 @@ func cachePut(cache *pkg.Cache, cmd *cli.Command) error {
 	info, ok := sites[site]
 
 	if !ok {
-		slog.Info("Added", "site", site, "info", newInfo)
+		log.Info("Added", "site", site, "info", newInfo)
 		toAdd = true
 	}
 
 	if info != newInfo {
-		slog.Info("Updated", "site", site, "prev", info, "new", newInfo)
+		log.Info("Updated", "site", site, "prev", info, "new", newInfo)
 		toAdd = true
 	}
 
@@ -70,7 +70,7 @@ func cachePut(cache *pkg.Cache, cmd *cli.Command) error {
 		return saveSites(cache, sites)
 	}
 
-	slog.Info("Unchanged")
+	log.Info("Unchanged")
 	return nil
 }
 
@@ -87,7 +87,7 @@ func cacheRemove(cache *pkg.Cache, cmd *cli.Command) error {
 		return saveSites(cache, sites)
 	}
 
-	slog.Warn("No such site", "site", site)
+	log.Warn("No such site", "site", site)
 	return nil
 }
 

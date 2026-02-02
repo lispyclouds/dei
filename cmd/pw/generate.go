@@ -3,11 +3,11 @@ package pw
 import (
 	"errors"
 	"fmt"
-	"log/slog"
 	"net/url"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/log"
 	"github.com/lispyclouds/dei/pkg"
 	"github.com/urfave/cli/v3"
 	"golang.org/x/net/publicsuffix"
@@ -81,7 +81,7 @@ func cacheSite(cache *pkg.Cache, site string, sites Sites, info SiteInfo) error 
 		updateNeeded = true
 	case currentInfo != info:
 		updateNeeded = true
-		slog.Info("Site info changed, updating", "site", site, "prev", currentInfo, "next", info)
+		log.Info("Site info changed, updating", "site", site, "prev", currentInfo, "next", info)
 	}
 
 	if !updateNeeded {
@@ -97,13 +97,13 @@ func onlyHosts(site string) string {
 	parsed, err := url.Parse(site)
 	toExtract := parsed.Hostname()
 	if err != nil || len(toExtract) == 0 {
-		slog.Warn("Cannot parse hostname, using as is", "site", site)
+		log.Warn("Cannot parse hostname, using as is", "site", site)
 		toExtract = site
 	}
 
 	host, err := publicsuffix.EffectiveTLDPlusOne(toExtract)
 	if err != nil {
-		slog.Warn("Cannot extract eTLD+1, using as is", "site", site)
+		log.Warn("Cannot extract eTLD+1, using as is", "site", site)
 		return site
 	}
 
@@ -124,7 +124,7 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 	var cryptoKey []byte
 
 	site := onlyHosts(strings.TrimSpace(cmd.String("site")))
-	slog.Info("Generating for", "site", site)
+	log.Info("Generating for", "site", site)
 
 	if !noCache {
 		cachedMainKey, err := cache.Get(mainKeyCacheKey)

@@ -2,9 +2,9 @@ package pkg
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/log"
 	"github.com/urfave/cli/v3"
 )
 
@@ -29,6 +29,6 @@ func Input(prompt, placeholder string, noEcho bool) (string, error) {
 }
 
 func CommandNotFound(_ context.Context, cmd *cli.Command, command string) {
-	slog.Error("Unknown command", "command", command)
+	log.Error("Unknown command", "command", command)
 	cli.ShowSubcommandHelpAndExit(cmd, 1)
 }

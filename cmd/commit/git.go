@@ -3,11 +3,11 @@ package commit
 import (
 	"errors"
 	"fmt"
-	"log/slog"
 	"os/exec"
 	"strings"
 
 	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/log"
 	"github.com/lispyclouds/dei/pkg"
 	"github.com/urfave/cli/v3"
 )
@@ -17,7 +17,7 @@ import (
 func run(cmd string, args ...string) (string, error) {
 	out, err := exec.Command(cmd, args...).CombinedOutput()
 	if err != nil {
-		slog.Error("Error running command", "cmd", cmd, "args", args)
+		log.Error("Error running command", "cmd", cmd, "args", args)
 		fmt.Println(string(out))
 
 		return "", err
