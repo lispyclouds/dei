@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"log"
 	"os"
 
+	"github.com/charmbracelet/log"
 	"github.com/lispyclouds/dei/cmd/commit"
 	"github.com/lispyclouds/dei/cmd/pw"
 	"github.com/lispyclouds/dei/pkg"
