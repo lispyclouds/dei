@@ -27,11 +27,22 @@ func NewCache() (*Cache, error) {
 	}
 
 	dbDir := path.Join(cacheDir, "dei")
+	dbPath := path.Join(dbDir, "cache.sqlite.db")
+
+	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
+		db, err := sql.Open("sqlite3", dbPath)
+		if err != nil {
+			return nil, err
+		}
+
+		return &Cache{db: db}, nil
+	}
+
 	if err = os.MkdirAll(dbDir, os.ModePerm); err != nil {
 		return nil, err
 	}
 
-	db, err := sql.Open("sqlite3", path.Join(dbDir, "cache.sqlite.db"))
+	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		return nil, err
 	}
