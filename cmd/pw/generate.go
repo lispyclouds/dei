@@ -132,7 +132,7 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 			return err
 		}
 
-		if !flushCache && cachedMainKey != nil {
+		if !flushCache && cachedMainKey != "" {
 			if cacheSecurityScheme == "pin" {
 				pin, err := pkg.Input("Enter the PIN", "", true)
 				if err != nil {
@@ -141,7 +141,7 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 
 				cryptoKey = []byte(pin)
 
-				mainKey, err = decrypt(cachedMainKey, cryptoKey)
+				mainKey, err = decrypt([]byte(cachedMainKey), cryptoKey)
 				if err != nil {
 					return fmt.Errorf("%s: either wrong PIN or data is corrupted", err)
 				}
@@ -153,8 +153,8 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 			return err
 		}
 
-		if cachedIdenticon != nil {
-			identicon = string(cachedIdenticon)
+		if cachedIdenticon != "" {
+			identicon = cachedIdenticon
 		}
 
 		sites, err = loadSites(cache)
@@ -211,8 +211,8 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 
 				if err = cache.
 					WithWriteTxn().
-					Put(mainKeyCacheKey, secureKey).
-					Put(identiconCacheKey, []byte(identicon)).
+					Put(mainKeyCacheKey, string(secureKey)).
+					Put(identiconCacheKey, identicon).
 					Run(); err != nil {
 					return err
 				}

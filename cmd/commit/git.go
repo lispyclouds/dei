@@ -52,8 +52,8 @@ func commit(cache *pkg.Cache, cmd *cli.Command) error {
 		return err
 	}
 
-	if cachedFeat != nil {
-		feat = string(cachedFeat)
+	if cachedFeat != "" {
+		feat = cachedFeat
 	}
 
 	featResp, err := pkg.Input("Feature", feat, false)
@@ -134,5 +134,5 @@ func commit(cache *pkg.Cache, cmd *cli.Command) error {
 		return err
 	}
 
-	return cache.Put(featCacheKey, []byte(feat))
+	return cache.Put(featCacheKey, feat)
 }

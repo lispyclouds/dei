@@ -1,25 +1,23 @@
 package pkg
 
 import (
+	"context"
 	"os"
 	"path"
 
-	"go.etcd.io/bbolt"
+	"database/sql"
+
+	_ "github.com/ncruces/go-sqlite3/driver"
+	_ "github.com/ncruces/go-sqlite3/embed"
 )
 
 type Cache struct {
-	db     *bbolt.DB
-	bucket []byte
-}
-
-type pair struct {
-	k string
-	v []byte
+	db *sql.DB
 }
 
 type WriteTxn struct {
 	cache *Cache
-	pairs []pair
+	pairs []string
 }
 
 func NewCache() (*Cache, error) {
@@ -33,45 +31,47 @@ func NewCache() (*Cache, error) {
 		return nil, err
 	}
 
-	db, err := bbolt.Open(path.Join(dbDir, "cache.bolt.db"), 0600, nil)
+	db, err := sql.Open("sqlite3", path.Join(dbDir, "cache.sqlite.db"))
 	if err != nil {
 		return nil, err
 	}
 
-	bucketName := []byte("cache")
-	if err = db.Update(func(tx *bbolt.Tx) error {
-		if bucket := tx.Bucket(bucketName); bucket == nil {
-			_, err = tx.CreateBucket(bucketName)
-			return err
-		}
-
-		return nil
-	}); err != nil {
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value TEXT)")
+	if err != nil {
 		return nil, err
 	}
 
-	return &Cache{db: db, bucket: bucketName}, nil
+	return &Cache{db: db}, nil
+}
+
+func insert(db *sql.DB, ctx context.Context, k, v string) error {
+	_, err := db.ExecContext(ctx, "INSERT INTO cache VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value=?", k, v, v)
+	return err
 }
 
 func (c *Cache) Close() error {
 	return c.db.Close()
 }
 
-func (c *Cache) Put(k string, v []byte) error {
-	return c.db.Update(func(tx *bbolt.Tx) error {
-		return tx.Bucket(c.bucket).Put([]byte(k), v)
-	})
+func (c *Cache) Put(k, v string) error {
+	return insert(c.db, context.Background(), k, v)
 }
 
-func (c *Cache) Get(k string) ([]byte, error) {
-	var value []byte
-
-	if err := c.db.View(func(tx *bbolt.Tx) error {
-		value = tx.Bucket(c.bucket).Get([]byte(k))
-		return nil
-	}); err != nil {
-		return nil, err
+func (c *Cache) Get(k string) (string, error) {
+	result, err := c.db.Query("SELECT value FROM cache WHERE key=?", k)
+	if err != nil {
+		return "", err
 	}
+
+	if !result.Next() {
+		return "", nil
+	}
+
+	var value string
+	if err = result.Scan(&value); err != nil {
+		return "", err
+	}
+	result.Close()
 
 	return value, nil
 }
@@ -80,19 +80,25 @@ func (c *Cache) WithWriteTxn() *WriteTxn {
 	return &WriteTxn{cache: c}
 }
 
-func (wtx *WriteTxn) Put(k string, v []byte) *WriteTxn {
-	wtx.pairs = append(wtx.pairs, pair{k, v})
+func (wtx *WriteTxn) Put(k, v string) *WriteTxn {
+	wtx.pairs = append(wtx.pairs, k, v)
 	return wtx
 }
 
 func (wtx *WriteTxn) Run() error {
-	return wtx.cache.db.Batch(func(tx *bbolt.Tx) error {
-		for _, pair := range wtx.pairs {
-			if err := tx.Bucket(wtx.cache.bucket).Put([]byte(pair.k), pair.v); err != nil {
-				return err
-			}
-		}
+	ctx := context.Background()
 
-		return nil
-	})
+	tx, err := wtx.cache.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	for i := 0; i+1 < len(wtx.pairs); i += 2 {
+		if err = insert(wtx.cache.db, ctx, wtx.pairs[i], wtx.pairs[i+1]); err != nil {
+			return err
+		}
+	}
+
+	return tx.Commit()
 }

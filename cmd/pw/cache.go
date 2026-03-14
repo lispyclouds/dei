@@ -5,6 +5,7 @@ import (
 	"encoding/json/jsontext"
 	json "encoding/json/v2"
 	"os"
+	"strings"
 
 	"github.com/charmbracelet/log"
 	"github.com/lispyclouds/dei/pkg"
@@ -19,12 +20,12 @@ func loadSites(cache *pkg.Cache) (Sites, error) {
 		return nil, err
 	}
 
-	if cachedSites == nil {
+	if cachedSites == "" {
 		return Sites{}, nil
 	}
 
 	var sites Sites
-	if err = json.UnmarshalRead(bytes.NewReader(cachedSites), &sites); err != nil {
+	if err = json.UnmarshalRead(strings.NewReader(cachedSites), &sites); err != nil {
 		return nil, err
 	}
 
@@ -37,7 +38,7 @@ func saveSites(cache *pkg.Cache, sites Sites) error {
 		return err
 	}
 
-	return cache.Put(sitesCacheKey, buffer.Bytes())
+	return cache.Put(sitesCacheKey, buffer.String())
 }
 
 func cachePut(cache *pkg.Cache, cmd *cli.Command) error {

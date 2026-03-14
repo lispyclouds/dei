@@ -5,6 +5,7 @@ import (
 	json "encoding/json/v2"
 	"fmt"
 	"os"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/lispyclouds/dei/pkg"
@@ -20,12 +21,12 @@ func loadCoAuthors(cache *pkg.Cache) (CoAuthors, error) {
 		return nil, err
 	}
 
-	if data == nil {
+	if data == "" {
 		return CoAuthors{}, nil
 	}
 
 	var coAuthors CoAuthors
-	if err = json.UnmarshalRead(bytes.NewReader(data), &coAuthors); err != nil {
+	if err = json.UnmarshalRead(strings.NewReader(data), &coAuthors); err != nil {
 		return nil, err
 	}
 
@@ -56,7 +57,7 @@ func manageCoAuthor(cache *pkg.Cache, name, email, op string) error {
 		return err
 	}
 
-	return cache.Put(coAuthorsKey, buffer.Bytes())
+	return cache.Put(coAuthorsKey, buffer.String())
 }
 
 func listCoAuthors(cache *pkg.Cache) error {
