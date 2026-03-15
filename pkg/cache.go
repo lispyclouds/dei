@@ -2,10 +2,9 @@ package pkg
 
 import (
 	"context"
+	"database/sql"
 	"os"
 	"path"
-
-	"database/sql"
 
 	_ "github.com/ncruces/go-sqlite3/driver"
 	_ "github.com/ncruces/go-sqlite3/embed"
@@ -69,20 +68,14 @@ func (c *Cache) Put(k, v string) error {
 }
 
 func (c *Cache) Get(k string) (string, error) {
-	result, err := c.db.Query("SELECT value FROM cache WHERE key=?", k)
-	if err != nil {
-		return "", err
-	}
-
-	if !result.Next() {
-		return "", nil
-	}
-
 	var value string
-	if err = result.Scan(&value); err != nil {
+
+	if err := c.db.QueryRow("SELECT value FROM cache WHERE key=?", k).Scan(&value); err != nil {
+		if err == sql.ErrNoRows {
+			return "", nil
+		}
 		return "", err
 	}
-	result.Close()
 
 	return value, nil
 }
