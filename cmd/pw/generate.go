@@ -1,11 +1,13 @@
 package pw
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/url"
 	"strings"
 
+	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
 	"github.com/lispyclouds/dei/pkg"
@@ -127,12 +129,20 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 	log.Info("Generating for", "site", site)
 
 	if !noCache {
-		cachedMainKey, err := cache.Get(mainKeyCacheKey)
+		data, err := cache.Get(mainKeyCacheKey)
 		if err != nil {
 			return err
 		}
 
-		if !flushCache && cachedMainKey != "" {
+		cachedMainKey := []byte{}
+		if data != "" {
+			cachedMainKey, err = hex.DecodeString(data)
+			if err != nil {
+				return err
+			}
+		}
+
+		if !flushCache && len(cachedMainKey) > 0 {
 			if cacheSecurityScheme == "pin" {
 				pin, err := pkg.Input("Enter the PIN", "", true)
 				if err != nil {
@@ -140,8 +150,7 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 				}
 
 				cryptoKey = []byte(pin)
-
-				mainKey, err = decrypt([]byte(cachedMainKey), cryptoKey)
+				mainKey, err = decrypt(cachedMainKey, cryptoKey)
 				if err != nil {
 					return fmt.Errorf("%s: either wrong PIN or data is corrupted", err)
 				}
@@ -179,6 +188,18 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 			return err
 		}
 
+		var confirmed bool
+		if err := huh.NewConfirm().
+			Title(fmt.Sprintf("Identicon: %s, looks good?", identicon)).
+			Value(&confirmed).
+			Run(); err != nil {
+			return err
+		}
+
+		if !confirmed {
+			return errors.New("Aborted")
+		}
+
 		mainKey, err = mainKeyOf(fullName, mainPass, variant)
 		if err != nil {
 			return err
@@ -211,7 +232,7 @@ func generate(cache *pkg.Cache, cmd *cli.Command) error {
 
 				if err = cache.
 					WithWriteTxn().
-					Put(mainKeyCacheKey, string(secureKey)).
+					Put(mainKeyCacheKey, hex.EncodeToString(secureKey)).
 					Put(identiconCacheKey, identicon).
 					Run(); err != nil {
 					return err
