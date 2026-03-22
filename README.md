@@ -14,7 +14,7 @@ Since I essentially wanted "myself in code" its only natural to call this tool `
 
 To install as a Go binary:
 
-- Ensure Go 1.25+ is [installed](https://go.dev/doc/install)
+- Ensure Go 1.26+ is [installed](https://go.dev/doc/install)
 - Run `GOEXPERIMENT=jsonv2 go install github.com/lispyclouds/dei@latest`
 - See what's possible: `dei --help`
 
