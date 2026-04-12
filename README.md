@@ -88,6 +88,38 @@ dei commit co-authors remove --email bar
 dei commit co-authors list
 ```
 
+#### Managing treesitter parsers and queries
+
+[Treesitter](https://tree-sitter.github.io/tree-sitter/) has become an indispensable tool to not only highlight but also do fancy semantic things, specially in Neovim.
+
+Given a config like so:
+
+```json
+{
+  "installPath": "~/.local/share/nvim/site/parser",
+  "queriesPath": "~/.local/share/nvim/site/queries",
+  "langs": {
+    "clojure": {
+      "url": "https://github.com/sogaiu/tree-sitter-clojure"
+    },
+    "go": {
+      "url": "https://github.com/tree-sitter/tree-sitter-go"
+    },
+    "python": {
+      "url": "https://github.com/tree-sitter/tree-sitter-python"
+    }
+  }
+}
+```
+
+dei can do the following:
+
+- Download the parser and queries
+- Compile using [treesitter cli](https://github.com/tree-sitter/tree-sitter/releases). THIS MUST BE INSTALLED.
+- Install the parsers and link the queries at the paths provided
+
+This removes the need to have plugins like [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) which essentially does this.
+
 ## License
 
 Copyright © 2025- Rahul De

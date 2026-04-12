@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"os"
-	"path"
+	"path/filepath"
 
 	_ "github.com/ncruces/go-sqlite3/driver"
 )
@@ -24,8 +24,8 @@ func NewCache() (*Cache, error) {
 		return nil, err
 	}
 
-	dbDir := path.Join(cacheDir, "dei")
-	dbPath := path.Join(dbDir, "cache.sqlite.db")
+	dbDir := filepath.Join(cacheDir, "dei")
+	dbPath := filepath.Join(dbDir, "cache.sqlite.db")
 
 	if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
 		db, err := sql.Open("sqlite3", dbPath)

@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/lispyclouds/dei/cmd/commit"
 	"github.com/lispyclouds/dei/cmd/pw"
+	"github.com/lispyclouds/dei/cmd/ts"
 	"github.com/lispyclouds/dei/pkg"
 	"github.com/urfave/cli/v3"
 )
@@ -25,6 +26,7 @@ func main() {
 		Commands: []*cli.Command{
 			pw.PwdCmd(cache),
 			commit.CommitCmd(cache),
+			ts.TsCmd(cache),
 		},
 		Flags: []cli.Flag{
 			&cli.BoolFlag{

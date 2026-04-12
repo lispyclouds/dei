@@ -2,6 +2,8 @@ package pkg
 
 import (
 	"context"
+	"fmt"
+	"os/exec"
 
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/log"
@@ -31,4 +33,16 @@ func Input(prompt, placeholder string, noEcho bool) (string, error) {
 func CommandNotFound(_ context.Context, cmd *cli.Command, command string) {
 	log.Error("Unknown command", "command", command)
 	cli.ShowSubcommandHelpAndExit(cmd, 1)
+}
+
+func Run(cmd *exec.Cmd) (string, error) {
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Error("Error running command", "cmd", cmd)
+		fmt.Println(string(out))
+
+		return "", err
+	}
+
+	return string(out), nil
 }

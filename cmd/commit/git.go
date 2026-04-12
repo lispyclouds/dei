@@ -7,27 +7,14 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/huh"
-	"github.com/charmbracelet/log"
 	"github.com/lispyclouds/dei/pkg"
 	"github.com/urfave/cli/v3"
 )
 
 // TODO: Use go-git when
 
-func run(cmd string, args ...string) (string, error) {
-	out, err := exec.Command(cmd, args...).CombinedOutput()
-	if err != nil {
-		log.Error("Error running command", "cmd", cmd, "args", args)
-		fmt.Println(string(out))
-
-		return "", err
-	}
-
-	return string(out), nil
-}
-
 func preChecks() error {
-	out, err := run("git", "status", "--porcelain")
+	out, err := pkg.Run(exec.Command("git", "status", "--porcelain"))
 	if err != nil {
 		return err
 	}
@@ -124,13 +111,13 @@ func commit(cache *pkg.Cache, cmd *cli.Command) error {
 		}
 	}
 
-	if _, err = run(
+	if _, err = pkg.Run(exec.Command(
 		"git",
 		"commit",
 		"--cleanup=verbatim",
 		"-m",
 		fmt.Sprintf("[%s] %s%s%s", feat, summary, extendedCommitMsg, coAuthorsText),
-	); err != nil {
+	)); err != nil {
 		return err
 	}
 
