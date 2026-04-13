@@ -26,7 +26,7 @@ func main() {
 		Commands: []*cli.Command{
 			pw.PwdCmd(cache),
 			commit.CommitCmd(cache),
-			ts.TsCmd(cache),
+			ts.TsCmd(),
 		},
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
