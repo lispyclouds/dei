@@ -27,6 +27,10 @@ func preChecks() error {
 }
 
 func commit(cache *pkg.Cache, cmd *cli.Command) error {
+	if !pkg.Which("git") {
+		return errors.New("Cannot find git on the PATH")
+	}
+
 	if err := preChecks(); err != nil {
 		return err
 	}

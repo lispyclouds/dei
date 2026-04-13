@@ -3,6 +3,7 @@ package ts
 import (
 	"context"
 	json "encoding/json/v2"
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -114,6 +115,14 @@ func expandHome(path string) (string, error) {
 }
 
 func syncCmd(_ context.Context, cmd *cli.Command) error {
+	if !pkg.Which("git") {
+		return errors.New("Cannot find git on the PATH")
+	}
+
+	if !pkg.Which("tree-sitter") {
+		return errors.New("Cannot find tree-sitter on the PATH")
+	}
+
 	f, err := os.Open(cmd.String("conf"))
 	if err != nil {
 		return err

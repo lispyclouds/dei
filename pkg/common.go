@@ -35,6 +35,11 @@ func CommandNotFound(_ context.Context, cmd *cli.Command, command string) {
 	cli.ShowSubcommandHelpAndExit(cmd, 1)
 }
 
+func Which(cmd string) bool {
+	_, err := exec.LookPath(cmd)
+	return err == nil
+}
+
 func Run(cmd *exec.Cmd) (string, error) {
 	out, err := cmd.CombinedOutput()
 	if err != nil {

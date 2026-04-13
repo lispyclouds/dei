@@ -92,7 +92,7 @@ dei commit co-authors list
 
 [Treesitter](https://tree-sitter.github.io/tree-sitter/) has become an indispensable tool to not only highlight but also do fancy semantic things, specially in Neovim.
 
-Given a config like so:
+Given a `conf.json`:
 
 ```json
 {
@@ -112,7 +112,7 @@ Given a config like so:
 }
 ```
 
-dei can do the following:
+dei can do the following when running `dei ts sync -c conf.json`:
 
 - Download the parser and queries
 - Compile using [treesitter cli](https://github.com/tree-sitter/tree-sitter/releases). THIS MUST BE INSTALLED.

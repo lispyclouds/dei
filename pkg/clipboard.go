@@ -10,7 +10,7 @@ import (
 
 func getCopyCmd(tools map[string][]string) (*exec.Cmd, error) {
 	for tool, args := range tools {
-		if _, err := exec.LookPath(tool); err == nil {
+		if Which(tool) {
 			return exec.Command(tool, args...), nil
 		}
 	}
