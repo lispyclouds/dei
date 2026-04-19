@@ -92,22 +92,28 @@ dei commit co-authors list
 
 [Treesitter](https://tree-sitter.github.io/tree-sitter/) has become an indispensable tool to not only highlight but also do fancy semantic things, specially in Neovim.
 
-Given a `conf.json`:
+Given a `conf.json`: (~ will be expanded as home)
 
 ```json
 {
-  "installPath": "~/.local/share/nvim/site/parser",
   "queriesPath": "~/.local/share/nvim/site/queries",
-  "langs": {
-    "clojure": {
-      "url": "https://github.com/sogaiu/tree-sitter-clojure"
-    },
-    "go": {
-      "url": "https://github.com/tree-sitter/tree-sitter-go"
-    },
-    "python": {
-      "url": "https://github.com/tree-sitter/tree-sitter-python"
+  "parsers": {
+    "installPath": "~/.local/share/nvim/site/parser",
+    "langs": {
+      "clojure": {
+        "url": "https://github.com/sogaiu/tree-sitter-clojure"
+      },
+      "go": {
+        "url": "https://github.com/tree-sitter/tree-sitter-go"
+      }
     }
+  },
+  "queries": {
+    "repoPrefix": "https://github.com/neovim-treesitter/nvim-treesitter-queries-",
+    "langs": [
+      "clojure",
+      "go"
+    ]
   }
 }
 ```
@@ -116,7 +122,7 @@ dei can do the following when running `dei ts sync -c conf.json`:
 
 - Download the parser and queries
 - Compile using [treesitter cli](https://github.com/tree-sitter/tree-sitter/releases). THIS MUST BE INSTALLED.
-- Install the parsers and link the queries at the paths provided
+- Install the parsers and link the queries at the paths provided, favouring the queries from the queries block over the parsers block
 
 This removes the need to have plugins like [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) which essentially does this.
 
