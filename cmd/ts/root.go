@@ -36,12 +36,13 @@ func action(_ context.Context, cmd *cli.Command) error {
 		return err
 	}
 	cacheDir = filepath.Join(cacheDir, "dei", "ts")
+	flushCache := cmd.Bool("flush-cache")
 
-	if err = syncQueries(conf, filepath.Join(cacheDir, "queries")); err != nil {
+	if err = syncQueries(conf, filepath.Join(cacheDir, "queries"), flushCache); err != nil {
 		return err
 	}
 
-	return syncParsers(conf, cacheDir, cmd.String("cli"))
+	return syncParsers(conf, cacheDir, cmd.String("cli"), flushCache)
 }
 
 func TsCmd() *cli.Command {

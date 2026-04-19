@@ -10,7 +10,11 @@ import (
 	"github.com/lispyclouds/dei/pkg"
 )
 
-func buildParserIfChanged(cli, name, dir, url, repoPath, artifact, queriesDest, parserDest string) error {
+func buildParserIfChanged(cli, name, dir, url, repoPath, artifact, queriesDest, parserDest string, flushCache bool) error {
+	if flushCache {
+		os.RemoveAll(dir)
+	}
+
 	cloned := false
 
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
@@ -23,9 +27,16 @@ func buildParserIfChanged(cli, name, dir, url, repoPath, artifact, queriesDest, 
 		}
 
 		log.Info("Linking queries", "url", url)
-		err = os.Symlink(filepath.Join(dir, "queries"), filepath.Join(queriesDest, name))
-		if err != nil {
-			return err
+		destPath := filepath.Join(queriesDest, name)
+
+		if _, err := os.Lstat(destPath); err != nil {
+			if !os.IsNotExist(err) {
+				return err
+			}
+
+			if err = os.Symlink(filepath.Join(dir, "queries"), filepath.Join(queriesDest, name)); err != nil {
+				return err
+			}
 		}
 
 		cloned = true
@@ -68,7 +79,7 @@ func buildParserIfChanged(cli, name, dir, url, repoPath, artifact, queriesDest, 
 	return err
 }
 
-func syncParsers(conf Conf, cacheDir, cli string) error {
+func syncParsers(conf Conf, cacheDir, cli string, flushCache bool) error {
 	queriesPath, err := expandHome(conf.QueriesPath)
 	if err != nil {
 		return err
@@ -92,6 +103,7 @@ func syncParsers(conf Conf, cacheDir, cli string) error {
 				name+sharedLibExt(),
 				queriesPath,
 				installPath,
+				flushCache,
 			); err != nil {
 				log.Error("Error in parser", "name", name, "err", err)
 			}

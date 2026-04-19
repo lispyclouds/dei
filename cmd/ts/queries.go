@@ -8,7 +8,11 @@ import (
 	"github.com/charmbracelet/log"
 )
 
-func syncQueryIfChanged(name, url, dir, queriesDest string) error {
+func syncQueryIfChanged(name, url, dir, queriesDest string, flushCache bool) error {
+	if flushCache {
+		os.RemoveAll(dir)
+	}
+
 	cloned := false
 
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
@@ -43,7 +47,7 @@ func syncQueryIfChanged(name, url, dir, queriesDest string) error {
 	return nil
 }
 
-func syncQueries(conf Conf, cacheDir string) error {
+func syncQueries(conf Conf, cacheDir string, flushCache bool) error {
 	repoPrefix, err := expandHome(conf.Queries.RepoPrefix)
 	if err != nil {
 		return err
@@ -63,6 +67,7 @@ func syncQueries(conf Conf, cacheDir string) error {
 				repoPrefix+name,
 				filepath.Join(cacheDir, name),
 				installPath,
+				flushCache,
 			); err != nil {
 				log.Error("Error fetching query", "name", name, "err", err)
 			}
