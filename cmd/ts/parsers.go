@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"sync"
 
 	"github.com/charmbracelet/log"
@@ -79,7 +80,7 @@ func buildParserIfChanged(cli, name, dir, url, repoPath, artifact, queriesDest, 
 	return err
 }
 
-func syncParsers(conf Conf, cacheDir, cli string, flushCache bool) error {
+func syncParsers(conf Conf, cacheDir, cli string, flushCache bool, langs []string) error {
 	queriesPath, err := expandHome(conf.QueriesPath)
 	if err != nil {
 		return err
@@ -93,6 +94,10 @@ func syncParsers(conf Conf, cacheDir, cli string, flushCache bool) error {
 	var wg sync.WaitGroup
 
 	for name, info := range conf.Parsers.Langs {
+		if len(langs) > 0 && !slices.Contains(langs, name) {
+			continue
+		}
+
 		wg.Go(func() {
 			if err = buildParserIfChanged(
 				cli,

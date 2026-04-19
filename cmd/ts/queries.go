@@ -47,7 +47,7 @@ func syncQueryIfChanged(name, url, dir, queriesDest string, flushCache bool) err
 	return nil
 }
 
-func syncQueries(conf Conf, cacheDir string, flushCache bool) error {
+func syncQueries(conf Conf, cacheDir string, flushCache bool, langs []string) error {
 	repoPrefix, err := expandHome(conf.Queries.RepoPrefix)
 	if err != nil {
 		return err
@@ -60,7 +60,11 @@ func syncQueries(conf Conf, cacheDir string, flushCache bool) error {
 
 	var wg sync.WaitGroup
 
-	for _, name := range conf.Queries.Langs {
+	if len(langs) == 0 {
+		langs = conf.Queries.Langs
+	}
+
+	for _, name := range langs {
 		wg.Go(func() {
 			if err = syncQueryIfChanged(
 				name,

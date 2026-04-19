@@ -37,12 +37,13 @@ func action(_ context.Context, cmd *cli.Command) error {
 	}
 	cacheDir = filepath.Join(cacheDir, "dei", "ts")
 	flushCache := cmd.Bool("flush-cache")
+	langs := cmd.StringSlice("langs")
 
-	if err = syncQueries(conf, filepath.Join(cacheDir, "queries"), flushCache); err != nil {
+	if err = syncQueries(conf, filepath.Join(cacheDir, "queries"), flushCache, langs); err != nil {
 		return err
 	}
 
-	return syncParsers(conf, cacheDir, cmd.String("cli"), flushCache)
+	return syncParsers(conf, cacheDir, cmd.String("cli"), flushCache, langs)
 }
 
 func TsCmd() *cli.Command {
@@ -68,6 +69,10 @@ func TsCmd() *cli.Command {
 						Name:  "cli",
 						Usage: "The path to tree-sitter cli",
 						Value: "tree-sitter",
+					},
+					&cli.StringSliceFlag{
+						Name:  "langs",
+						Usage: "Sync only the specified langs. Specify separated by commas: --langs foo,bar",
 					},
 				},
 			},
