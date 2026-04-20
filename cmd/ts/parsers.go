@@ -35,7 +35,7 @@ func buildParserIfChanged(cli, name, dir, url, repoPath, artifact, queriesDest, 
 				return err
 			}
 
-			if err = os.Symlink(filepath.Join(dir, "queries"), filepath.Join(queriesDest, name)); err != nil {
+			if err = os.Symlink(filepath.Join(dir, repoPath, "queries"), filepath.Join(queriesDest, name)); err != nil {
 				return err
 			}
 		}
