@@ -1,6 +1,6 @@
 module github.com/lispyclouds/dei
 
-go 1.26.0
+go 1.27
 
 require (
 	github.com/charmbracelet/huh v1.0.0
