@@ -89,19 +89,11 @@ func (wtx *WriteTxn) Put(k, v string) *WriteTxn {
 }
 
 func (wtx *WriteTxn) Run() error {
-	ctx := context.Background()
-
-	tx, err := wtx.cache.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-
 	for i := 0; i+1 < len(wtx.pairs); i += 2 {
-		if err = insert(wtx.cache.db, ctx, wtx.pairs[i], wtx.pairs[i+1]); err != nil {
+		if err := insert(wtx.cache.db, context.Background(), wtx.pairs[i], wtx.pairs[i+1]); err != nil {
 			return err
 		}
 	}
 
-	return tx.Commit()
+	return nil
 }
